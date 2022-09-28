@@ -1,2 +1,2 @@
-# Wkwang' Research Log
-Weikang's Research Blog
+# Wkwang' Paper Log
+Weikang's Paper Reading Blog
