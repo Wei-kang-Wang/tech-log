@@ -1,7 +1,7 @@
 ---
 layout: post
 comments: false
-title: "[论文]Keypoint"
+title: "Keypoint"
 date: 2020-01-01 01:09:00
 tags: paper-reading
 ---
