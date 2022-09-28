@@ -1,0 +1,19 @@
+title: Wkwang'Research Log
+author: Weikang Wang
+baseurl: "/research-log"
+description: Trace my thoughts
+profile_url: "http://Wei-kang-Wang.github.io"
+
+# Build settings
+markdown: kramdown
+highlighter: rouge
+excerpt_separator: <!--more-->
+gems:
+  - jekyll-feed
+exclude:
+  - Gemfile
+  - Gemfile.lock
+kramdown:
+  input: GFM
+  auto_ids: true
+  syntax_highlighter: rouge
