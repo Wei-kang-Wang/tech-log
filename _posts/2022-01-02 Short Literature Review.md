@@ -1,7 +1,7 @@
 ---
 layout: post
 comments: false
-title: "[论文]Short Literature Review"
+title: "Short Literature Review"
 date: 2022-06-06 01:09:00
 tags: paper-reading
 ---
