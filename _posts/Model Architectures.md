@@ -1,7 +1,7 @@
 ---
 layout: post
 comments: false
-title: "[论文]Model Architectures"
+title: "Model Architectures"
 date: 2021-11-29 01:09:00
 tags: paper-reading
 ---
