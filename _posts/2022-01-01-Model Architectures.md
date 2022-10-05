@@ -1468,7 +1468,7 @@ Facebook的大佬，五个人在Google scholar上的引用量加起来有50万�
 
 **3. Method**
 
-**3.1 Contrastive learnin as distionary look-up**
+**3.1 Contrastive learning as distionary look-up**
 
 对比学习，以及它的一些变体，都可以被认为是训练一个编码器来进行一个字典查找的任务。
 
