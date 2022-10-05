@@ -1676,9 +1676,9 @@ for x in loader:            # 从dataloader里取一个mini batch的数据，有
 我们提出的无监督表征学习方法在一系列视觉任务上都取得了很好的结果。但有一些开放性的问题值得讨论。首先，当我们使用10亿的数据集而不是ImageNet那个100万的数据集的时候，性能提升是有的，但是比较小。这说明大规模的数据集并没有被很好的利用起来。一个更好的代理任务可能可以解决这个问题。除了这个简单的instance discrimination的代理任务，我们有没有可能将MoCo和其它的代理任务，比如说masked auto-encoding结合起来用呢？比如说NLP里的BERT。MoCo设计的初衷就是去构造一个大的字典，从而让正负样本能够更有效地去对比，提供一个稳定的自监督信号，最后去训练这个模型。
 
 
-### 2. [对比学习串烧：对比学习在CV领域的发展历程总结]
+### 2. [对比学习串烧：对比学习在CV领域的发展历程总结]（从2018年到2021年12月31日）
 
-将具有代表性的工作进行总结，对比学习在CV领域的发展大致可以分为四个阶段：（1）百花齐放：InstDisc，InvaSpread，CPC，CMC。在这个阶段，方法、模型都还没有统一，目标函数也没有统一，代理任务也没有统一，所以说是一个百花齐放的时代。（2）CV双雄：MoCo和SimCLR之间的较量，介绍MoCov1，SimCLRv1，MoCov2，SimCLRv2，以及CPC和CMC的延伸工作，还有SwAV。这个阶段发展非常迅速，这些工作一般都是间隔一到两个月就进行了更新。ImageNet上最好的成绩基本上每个月都在被刷新。（3）不用负样本也可以做对比学习：BYOL以及后续的一些改进。最后，SimSiam将上述所有的方法进行了总结，都融入了一个框架之中。SimSiam是使用CNN做对比学习的一个总结性的工作。（4）之后就到了Transformer时代。Transformer：MoCov3和DINO。
+将具有代表性的工作进行总结，对比学习在CV领域的发展大致可以分为四个阶段：（1）百花齐放：InstDisc，InvaSpread，CPC，CMC。在这个阶段，方法、模型都还没有统一，目标函数也没有统一，代理任务也没有统一，所以说是一个百花齐放的时代。（2）CV双雄：MoCo和SimCLR之间的较量，介绍MoCov1，SimCLRv1，MoCov2，SimCLRv2，以及CPC和CMC的延伸工作，还有SwAV。这个阶段发展非常迅速，这些工作一般都是间隔一到两个月就进行了更新。ImageNet上最好的成绩基本上每个月都在被刷新。（3）不用负样本也可以做对比学习：BYOL以及后续的一些改进。最后，SimSiam将上述所有的方法进行了总结，都融入了一个框架之中。SimSiam是使用CNN做对比学习的一个总结性的工作。（4）之后就到了Transformer时代：MoCov3和DINO。
 
 >Vision Transformer十分火爆，所以很多人都使用ViT来设计模型。对于无监督学习来说，不管是对比学习，还是掩码学习，现在大家主要都是用ViT来做了。
 
@@ -1924,11 +1924,17 @@ SwAV的效果这么好，另一个重点是它使用了一个非常有用的tric
 
 #### 第三阶段
 
-讲一下不同负样本的对比学习。
+讲一下不用负样本的对比学习。第二阶段里的SWaV就已经有这个趋势了，它可以算作一个承上启下的工作，它也没有用负样本，而是使用的聚类中心，但是SWaV毕竟还是有一个明确的对比的对象那个的。但接下来要说的BYOL和SimSiam，实际上只涉及到了正样本，已经没有负样本或者聚类中心这样一个明确的对比对象了。
+
+#### 1. [BYOL: Bootstrap Your Own Latent A New Approach to Self-Supervised Learning]()
 
 
 
-### 3. [Dense Contrastive Learning for Self-Supervised Visual Pre-training](https://openaccess.thecvf.com/content/CVPR2021/papers/Wang_Dense_Contrastive_Learning_for_Self-Supervised_Visual_Pre-Training_CVPR_2021_paper.pdf)
+
+
+### 预测dense representation的对比学习方法（也就是representation learning所得到的特征的分辨率和输入图片的分辨率相同，对于每个像素点都学习一个特征）
+
+#### 1. [Dense Contrastive Learning for Self-Supervised Visual Pre-training](https://openaccess.thecvf.com/content/CVPR2021/papers/Wang_Dense_Contrastive_Learning_for_Self-Supervised_Visual_Pre-Training_CVPR_2021_paper.pdf)
 
 [CODE](https://git.io/DenseCL)
 
@@ -1998,14 +2004,14 @@ $$\mathcal L_q = -log \frac{exp(q \cdot k_+ / \tau}{exp(q \cdot k_+) + \Sigma_{k
 *fig 1. *
 
 
-**2.2 DenseCL Pipeline**
+**3.2 DenseCL Pipeline**
 
 文章提出了一个新的自监督的学习框架，是为了dense prediction的下游任务而设计的，这个框架叫做DenseCL。DenseCL将现有的自监督representation学习框架扩展到了dense的范畴。和2.1 background里提到的框架比，核心区别在于encoder和loss function的设计不一样。给定一个输入的view，其先通过一个backbone（比如ResNet或者VGG等CNN框架）得到dense feature map，然后再通过一个如下描述的projection head计算输出。这个projection head由两个平行的sub-heads组成：global projection head和dense projection head。global projection head就和之前提到的那些方法（MoCo等）里的projection head一样，获取的是view的全局整体特征。而dense projection head的输入是从backbone获取的feature map，而输出仍然是dense feature vectors。
 
 dense projection head的设计是。不再使用average global pooling和MLP，而是使用$$1 \times 1$$的convolutional layers。backbone和这两个平行的projection head是端到端进行训练的，通过优化一个联合的同时在global features和local features层面上的pairwise contrastive (dis)similarity loss来实现的。
 
 
-**2.3 Dense Contrastive Learning**
+**3.3 Dense Contrastive Learning**
 
 我们通过将原先的contrastive loss function拓展到一个dense的情况来进行dense contrastive learning。对于每个被编码的query $$r$$，我们定义一个集合的被编码的keys $$\lbrace t_0, t_1, \cdots \rbrace$$。然而，现在每个query并不再表示整张view，而表示的是每个view的一个局部区域。具体来说，每个被编码的query表示的是由dense projection head得到的ddense feature vector的一个像素点，其中dense feature vector的大小为$$S_h$$和$$S_w$$，它两可以相等也可以不等，简单起见，设置$$S_h = S_w = S$$。接下来我们要为每个从dense feature vector找到的query，得到它的negative keys和positive keys。其中negative keys比较简单，就是其它输入图片的views通过backbone和global projection head所得到的features，记为$$t_-$$，而positive keys则是我们需要重点关注的，其是从同一张图片的另一个views通过backbone和dense projection head所得到的大小为$$S_h \times S_w$$的dense feature vectors里的$$S^2$$个像素点中的一个，然而如何找到这一个在接下来的2.4里说，现在假设我们已经找到了，记为$$t_+$$。从而这个dense contrastive loss定义如下：
 
@@ -2020,7 +2026,7 @@ $$\mathcal L = (1 - \lambda) \mathcal L_q + \lambda \mathcal L_r$$
 其中$$\lambda$$是控制loss比例的超参数。在下面的实验里$$\lambda=0.5$$。
 
 
-**2.4 Dense Correspondence across views**
+**3.4 Dense Correspondence across views**
 
 我们对于输入的一张图片的两个views来找到它们之间的dense correspondence。对于每个view，backbone获取了feature map，记为$$\pmb F \in \mathbb R^{H \times W \times K}$$，基于这个feature map，dense projection head获取了dense feature vectors $$\Theta \in \mathbb R^{S_h \times S_w \times E$$}$$。我们这里设置$$S_w = S_h = S$$，但其实它们也是可以不同的。dense correspondence则是在两个views的dense feature vectors，$$\Theta_1$$和$$\Theta_2$$，之间获取的。文章是使用backbone feature maps $$\pmb F_1$$和$$\pmb F_2$$来匹配$$\pmb \Theta_1$$和$$\pmb \Theta_2$$的。首先将$$\pmb F_1$$和$$\pmb F_2$$使用adaptive average pooling降采样到大小为$$S \times S$$，然后再计算它两之间的cosine similarity矩阵 $$\Delta \in \mathbb R^{S^2 \times S^2}$$。而$$\pmb \Theta_1$$和$$\pmb \Theta_2$$之间的匹配规则是：每个view的dense feature vector的每个像素点在另一个view里的匹配点就是和这个像素点similarity最高的那个像素点。具体来说，对于$$\pmb \Theta_1$$，我们想找到$$\pmb \Theta_1$$里每个像素点在$$\pmb \Theta_2$$里的对应点，就是沿着dimension=2来计算$$\Delta$$的argmax：
 
@@ -2029,12 +2035,12 @@ $$c_i = argmax_j sim(\pmb f_i, \pmb f_j^{'})$$
 其中$$\pmb f_i$$是$$\pmb F_1$$的第$$i$$个feature vector，而$$\pmb f_j^{'}$$则是$$\pmb F_2$$的第$$j$$个feature vector。$$sim(u,v)$$表示$$u$$和$$v$$之间的cosine similarity。上述结果表明$$\pmb \Theta_1$$的第$$i$$个像素点对应的是$$\pmb \Theta_2$$里的第$$c_i$$个像素点。上述整个过程可以使用矩阵计算很快速的完成。
 
 
-### 4. [Crafting Better Contrastive Views for Siamese Representation Learning](https://openaccess.thecvf.com/content/CVPR2022/papers/Peng_Crafting_Better_Contrastive_Views_for_Siamese_Representation_Learning_CVPR_2022_paper.pdf)
+### 2. [Crafting Better Contrastive Views for Siamese Representation Learning](https://openaccess.thecvf.com/content/CVPR2022/papers/Peng_Crafting_Better_Contrastive_Views_for_Siamese_Representation_Learning_CVPR_2022_paper.pdf)
 
 *CVPR 2022*
 
 
-### 5. [Instances as Queries](https://openaccess.thecvf.com/content/ICCV2021/papers/Fang_Instances_As_Queries_ICCV_2021_paper.pdf)
+### 3. [Instances as Queries](https://openaccess.thecvf.com/content/ICCV2021/papers/Fang_Instances_As_Queries_ICCV_2021_paper.pdf)
 
 [CODE](https://github.com/hustvl/QueryInst)
 
