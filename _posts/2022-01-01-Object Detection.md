@@ -183,7 +183,8 @@ RCNN在VOC07上获得了显著的性能提升，在mean Average precision（mAP�
 *Nicolas Carion, Francisco Massa, Gabriel Synnaeve, Nicolas Usunier, Alexander Kirillov, Sergey Zagoruyko*
 
 **Abstract**
-作者提出了一个新的方法来解决object detection问题，其将这个问题看作一个直接的set prediction问题。作者的方法使得detection pipeline得以实现自动流水化，去除了很多需要手动操作的部分，比如非极大抑制（non-maximum suppression）、结合先验知识的anchor generation等。作者提出的方法的最主要的部分（也就是模型部分）叫做detection transformer（简称DETR），是一个基于transformer架构的encoder-decoder结构，使用的loss是一个基于set的二分匹配的loss。给一个固定的已经学习到了的物体类别构成的集合作为query，DETR会推测这些给定的objects与图片内容之间的relations，然后直接并行的输出图片里包含的objects。DETR在概念上很简单，而且和目前那些detectors不一样，并不需要指定一个库（也就是指定objects的类别范围）。DETR在COCO object detection数据集上和Faster R-CNN这个baseline效果相似。而且，DETR还可以很轻松的生成图片分割，作者用实验展示了效果要远超其它baselines。
+
+作者提出了一个新的方法来解决object detection问题，其将这个问题看作一个直接的set prediction问题。作者的方法使得detection pipeline得以实现自动流水化，去除了很多需要手动操作的部分，比如非极大抑制（non-maximum suppression）、结合先验知识的anchor generation等。作者提出的方法的最主要的部分（也就是模型部分）叫做detection transformer（简称DETR），是一个基于transformer架构的encoder-decoder结构，使用的loss是一个基于set的二分匹配的loss。给一个固定的已经学习到了的物体类别构成的集合作为query，DETR会推测这些给定的objects与图片内容之间的relations，然后直接并行的输出图片里包含的objects。DETR在概念上很简单，而且和目前那些detectors不一样，并不需要指定一个库（也就是指定objects的类别范围）。DETR在COCO object detection数据集上和Faster R-CNN这个baseline效果相似。而且，DETR还可以很轻易的应用于图片分割，作者用实验展示了效果要远超其它baselines。
 
 
 **1. Introduction**
@@ -194,13 +195,13 @@ object detection的目的是预测由bounding box构成的set以及每个object�
 
 作者将训练流程实现了自动流水化，他们将object detection任务看作一个直接的set detection任务。作者使用了以基于transformer架构的encoder-decoder模型（transformer对于sequence prediction是有优势的）。transformer架构里的自注意力机制（显式的对于sequence里的任意两个元素都计算其相关性）特别适合用来进行object detection任务（因为其可以很自然的解决重复的挨得很近的prediction的问题）。
 
-作者提出的detection transformer（DETR），由fig1所示，同时预测一张图片里的所有的objects，而且是一个端到端的模型，其使用的是一个set loss，会在预测的objects和ground-truth objects之间计算一个bi-partite matching。DETR通过丢弃那些结合了先验知识的需要手动设计的模块来大大简化了detectors的流程，比如说spatial anchors，或者non-maximal suppression。和现有的大多数detectors不一样，DETR并不需要任何特殊设计的layers，所以说内置了ResNet和Transformer架构的框架都可以很轻易地实现DETR模型的构建（比如PyTorch，TensorFlow等）。
+作者提出的detection transformer（DETR），由fig1所示，同时预测一张图片里的所有的objects，而且是一个端到端的模型，其使用的是一个set loss，会在预测的objects和ground-truth objects之间计算一个bipartite matching。DETR通过丢弃那些结合了先验知识的需要手动设计的模块来大大简化了detectors的流程，比如说spatial anchors，或者non-maximal suppression。和现有的大多数detectors不一样，DETR并不需要任何特殊设计的layers，所以说内置了ResNet和Transformer架构的框架都可以很轻易地实现DETR模型的构建（比如PyTorch，TensorFlow等）。
 
 ![detr1]({{ '/assets/images/DETR-1.PNG' | relative_url }})
 {: style="width: 800px; max-width: 100%;"}
 *Fig 1. DETR结合了一个CNN和一个Transformer架构来直接并行输出detection的集合。在训练过程中，bipartite matching会对每个ground-truth box唯一指定一个预测的结果来计算loss。那些没有匹配结果的预测结果就会被给定一个no object的类别预测。*
 
-之前也不是没有工作尝试进行直接的set prediction，和这些工作相比，DETR的最主要的特征是使用了bipartite matching loss以及使用了并行输出的decoding方式的transformer（在BERT或者最初的transformer架构里，decoder的输出是一种auto-regressive方式的，也就是一个个的输出，而且后一个输出依赖于之前的输出，但这里是并行输出，non-autoregressive）。而之前的那些工作是使用了autoregressive decoding方式的RNN：[End-to-end instance segmentation with recurrent attention]()，[Recurrent neural networks for semantic instance segmentation]()。本文使用的matching loss会对每个ground truth object匹配唯一一个预测的值，而且打乱预测的object的顺序也不影响匹配计算，所以说完全可以并行输出。
+之前也不是没有工作尝试进行直接的set prediction，和这些工作相比，DETR的最主要的特点是使用了bipartite matching loss以及使用了并行输出的decoding方式的transformer（在最初的transformer架构里，decoder的输出是一种auto-regressive方式的，也就是一个个的输出，而且后一个输出依赖于之前的输出，但这里是并行输出，non-autoregressive）。而之前的那些工作是使用了autoregressive decoding方式的RNN：[End-to-end instance segmentation with recurrent attention](https://openaccess.thecvf.com/content_cvpr_2017/papers/Ren_End-To-End_Instance_Segmentation_CVPR_2017_paper.pdf)，[Recurrent neural networks for semantic instance segmentation](https://arxiv.org/pdf/1712.00617.pdf)。本文使用的matching loss会对每个ground truth object匹配唯一一个预测的值，而且打乱预测的object的顺序也不影响匹配计算，所以说完全可以并行输出。
 
 作者在COCO object detection数据集上测试了DETR的效果，并和非常强大的对手Faster R-CNN进行了对比。Faster R-CNN已经经过了数代更新，现在非常的强大。作者的实验证明本文所提出的方法和Faster R-CNN在COCO数据集上的效果相当。更准确的说，DETR在一些更大的objects的检测上效果更好，这可能是得益于transformer的全局注意力机制。但是DETR在很小的objects上的检测效果就会差一些。实际上R-CNN也有这样的问题，但后来FPN解决了R-CNN在很小的物体上检测效果不好的问题，作者希望将来也有类似的工作来改进DETR的这个问题。
 
@@ -210,6 +211,48 @@ DETR的设计理念可以很容易的被扩展到更复杂的任务上。在作�
 
 >panoptic segmentation是最近新兴的一个具有挑战性的基于像素的recognition任务。
 
+
+**2. Related Work**
+
+本文的工作所基于的先前的工作可以分为以下几类：set prediction的bipartite matching loss，基于transformer的encoder-decoder架构，parallel decoding以及object detection method。
+
+**2.1 Set Prediction**
+
+现在还并没有一个标准的深度学习模型来直接预测sets。最简单最基础的set prediction任务是multilabel classification（和multiclass classification不一样，那个就是基础的分类任务，也就是每个输入只能被唯一分配一个类别，而multilabel classification里的每个输入可以被分配好几个label，它们之间互相不会排斥）。预测sets的任务的第一个难点是如何避免很相近的重复结果。绝大多数现在的detectors算法都是使用某种后验方法（在模型得出结果后使用的方法），比如说非极大抑制，来解决这个问题，但是直接的set prediction方法应该是不需要后验的。它们需要某种全局的方法来为所预测到的结果之间计算关系从而避免这种冗余信息。对于固定大小的set prediction任务，dense fully connected networks是可以很好解决的，但是计算量太大。一个general的方法是使用自回归序列模型，比如说RNN。但是在所有的情况下，loss function都需要对于预测结果的顺序是不变的。常见的方法是基于Hungarian algorithm来设计loss function，在ground-truth和prediction之间找一个bipartite matching。这样就可以确保loss对于预测结果顺序不变，而且每个预测结果有个唯一的match。这篇文章也采用了这种bipartite matching loss的方法。和之前绝大多数工作相比，作者并没有使用自回归模型，而是使用了并行输出结构的decoder的transformer架构，下面将会说。
+
+**2.2 Transformers and Parallel Decoding**
+
+Transformers是作为一个用来解决机器翻译任务而提出的基于注意力机制的模型。注意力机制是可以从整个输入的序列里来综合信息的。transformers里介绍的自注意力层，会扫过一个序列里所有的元素，然后以一种从整个序列里综合得到的信息的方式来更新每个元素对应的特征。基于注意力的模型的一个优势在于，其可以进行全局计算，这让它比RNN对于很长的序列来说效果更好。现在在NLP，CV领域，Transformers大有取代RNN的趋势。
+
+transformers最一开始提出是被用在自回归模型里的，这和早期的sequence-to-sequence模型是一样的，以一个一个元素的形式来输出。然而现在也有很多任务使用了并行输出的decoding模式的transformers。本文使用后者来进行set prediction。
+
+**2.3 Object detection**
+
+很多现代的object detectors是基于某些初始化的“猜测”来做预测的。two-stage detectors基于proposals来预测boxes，而single-stage detectors基于anchors或者一系列可能的物体中心点来预测。现在有工作表明，最后detectors效果的好坏很大程度上决定于早期这些猜测的效果。在本文中，作者可以丢弃这些早期的猜测，直接从输入图片或者视频里学习到box预测结果。
+
+*set-based loss*
+
+有些object detectors已经使用了bipartite matching loss。然而，在这些早期的深度学习模型里，不同的预测结果之间的关系是用卷积或者全连接层来建模的，然后还需要一个手动设置的非极大抑制后验步骤来提升效果。
+
+*recurrent detectors*
+
+
+**3. The DETR model**
+
+直接预测set的detection算法有两个关键的组件：（1）需要一个set prediction loss来迫使ground truth和预测结果之间有唯一的对应关系；（2）一个架构能一次性预测一系列物体和它们之间的关系。fig2详细描述了模型的细节。
+
+
+![detr2]({{ '/assets/images/DETR-2.PNG' | relative_url }})
+{: style="width: 800px; max-width: 100%;"}
+*Fig 2. DETR使用一个经典的CNN框架来学习一张输入图片的2D特征。接着将其展平，再加上positional encoding，然后送给一个transformer的encoder。transformer的decoder会使用encoder的输出结合一些固定数量的可学习的positional embeddings（叫做object queries）来输出结果。输出的每一个结果都通过一个feed forward network（FFN）（共用的）来预测一个结果，要么是一个物体类别和其的bounding box，要么是一个no class类别。*
+
+**3.1 Object detection set prediction loss**
+
+DETR的输出是一个固定的数值，也就是$$N$$个预测结果，而且是并行得到的，$$N$$是一个超参数，要比图片里可能存在的物体的数量大很多。训练的一个主要的难点在于如何根据ground truth来给预测结果打分（预测结果包括类别，位置）。本文使用的loss会在预测结果和ground truth结果之间产生一个bipartite matching，然后再进行bounding box loss的计算。
+
+用$$y$$表示物体set的ground truth，$$\hat y = \lbrace \hat y_i \rbrace_{i=1}^N$$表示的是$$N$$个预测结果。假设$$N$$要比一张图片里的物体数量多很多，作者将$$y$$也使用padding的方式加了很多$$\emptyset$$来表示no object这个类别。
+
+**3.2 DETR architecture**
 
 
 ## Generative model-based detectors
