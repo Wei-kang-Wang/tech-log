@@ -553,6 +553,138 @@ $$\mathcal L_{con}^{a} = \lVert \zeta_{x} - \zeta(D_y(\Phi_{X \rightarrow Y}^{g}
 *CVPR 2022*
 
 
+### 36. [EG3D: Efficient Geometry-aware 3D Generative Adversarial Networks](https://nvlabs.github.io/eg3d/)
+
+*CVPR 2022*
+
+Work from Stanford and NVidia.
+
+[POST](https://nvlabs.github.io/eg3d/)
+
+**Abstract**
+
+从一系列的2D图片中以无监督的方式来生成高质量的multi-view-consistent的2D图片以及3D的shape一直以来都是个很有挑战性的问题（这里的一系列2D的图片指的是同一个场景的2D图片）。现有的3D GANs要么就是计算量太大，要么就是无法做到3D-consistent，前者限制了生成图片的质量和分辨率，后者影响了multi-view consistency以及3D shape的质量。在这篇文章里，我们将要改进3D GAN的计算效率和图片质量。我们提出了一个expressive hybrid explicit-implicit网络框架，再结合一些其他的techniques，就可以在real time生成高质量高分辨率的multi-view consistent的图片，以及高质量的3D geometry。通过解耦feature generation和neural rendering，我们的框架可以使用sota的2D CNN generators（比如说StyleGAN2），从而可以借用它们的高效性和强表达性等优势。我们使用了FFHQ和AFHQ Cats数据集来展现了所提出的方法的效果。
+
+
+**1. Introduction**
+
+GAN在被提出之后，有了非常多以及非常广的改进，现在的一些模型已经可以生成高分辨率，photorealistic，真假难辨的图片了（[Alias-free generative adversarial networks]，[A style-based generator architecture for generative adversarial networks]，[Analyzing and improving the image quality of StyleGAN]）。但现有的sota GAN仅仅在2D下作用，而且并没有显式的对潜在的3D场景进行建模。
+
+最近的3D-aware GAN的工作开始研究multi-view consistent的图片生成问题，而且还研究了在没有geometry或者multi-view images作为监督数据的情况下获取3D shapes的问题。然而，现有的3D GAN生成的图片质量和分辨率都大大落后于这些2D GAN。而且，它们的3D reconstruction效果也还有很大的改进空间。有这样的差距的一个主要的原因是这些3D GANs的generators以及neural rendering architectures的计算都是很低效的。
+
+和2D GANs不同，3D GANs由两部分组成：一个含有3D structure aware inductive bias的generator，以及一个neural rendering eigine来提供view-consistent结果。generator里的inductive bias可以使用显式的voxel grids或者隐式的neural implicit representations来提供（有非常多的论文，去看原论文找引用，这里就不赘述）。尽管这些方法在单个场景下是成功的，但是它们对于训练一个3D GAN来说都是不合适的，因为就像NERF一样，训练一个这样的generator需要大量的单一场景的多角度图片，会使得计算非常的慢且低效。训练一个3D GAN需要渲染上千万级别的图片，但是sota的neural volume rendering方法（也就是NERF）如果要生成高质量图片的话，利用上述的那些方法那些representations根本是不可行的。基于CNN的upsampling网络被提出来解决这个问题（[GIRAFFE: Representing scenes as compositional generative neural feature fields]），但这样的方法会牺牲掉view consistency，并且会损害学习到的3D geometry。
+
+我们提出了一个新的方法来从一系列2D图片里无监督的学习3D representations，并且使得rendering的过程更加的高效。我们使用了一种双管齐下的策略来实现这个目标。首先，我们使用了一个hybrid explicit-implicit 3D representations来替代之前的explicit或者implicit的representations来做rendering，从而可以在不牺牲精度的情况下大大提升rendering的效率。其次，尽管我们提出的方法使用了一些近似可能会导致结果偏离ground truth的rendering结果，但我们提出了一种dual-discrimination的策略来保证rendering结果的view consistency。更进一步，我们还在generator里使用了pose-based的condition，其将pose-correlated的特征（比如说人脸表情）从其他特征中分离开，从而更好的对整个数据集里的这样的特征进行建模。
+
+我们提出的方法还有个附加的优势，其可以将feature generation和nerual rendering解耦开，从而我们就可以使用那些sota的2D CNN-based feature generator（比如说StyleGAN2）来在3D场景里生成features，然后再用我们提出的3D multi-view-consistent的neural volume rendering方法来进行渲染。我们的方法不仅在生成3D-aware的图片上qualititave和quantitative都达到了sota的效果，还可以输出场景的高质量的3D shapes（因为generator里有很强的3D structure aware inductive bias）。由fig1可见。
+
+本文的贡献总结如下：
+* 我们提出了一个tri-plane-based 3D GAN框架，其既高效也具有表达力，可以实现高分辨率的geometry-aware的图片生成。
+* 我们使用了一个3D GAN的训练策略，通过dual discrimination以及在generator里加pose condition来更好的对数据集里的pose-correlated的特征进行建模（比如说人脸表情），从而更好的实现multi-view consistency。
+* 我们在FFHQ和AFHQ CATS数据集上对所提出的方法进行测试并达到了sota的效果，而且还可以生成高质量的3D geometry。
+
+
+![eg3d1]({{ '/assets/images/EG3D-1.PNG' | relative_url }})
+{: style="width: 800px; max-width: 100%;"}
+*Fig 1 本文所提出的3D GAN可以实现高分辨率高质量的multi-view consistent的图片生成，并且还可以生成高质量的geometry。而且本文的模型并不需要shape priors，ground truth的3D scans或者multi-view supervision来辅助训练，只需要一个场景的多个角度的图片就可以了。*
+
+
+**2. Related work**
+
+*Neural scene representation and rendering*
+
+有大量的研究工作使用differentiable 3D-aware的representations来进行neural scene representations，这样的3D-aware representations可以通过优化由neural rendering得到的2D multi-view的图片来被学习到（相关论文太多，参考原论文，基本都是基于NERF的改进）。上述这种representations，显式的那些，比如discrete voxel grids（fig2 b所示），可以被非常快的计算，但是需要很多的memory来存储，从而将这种方法推广到高分辨率或者复杂场景的时候就很困难。implicit representations，或者coordinate networks（fig2 a所示），在memory存储上有优势，并且也能够表达复杂的场景（其将场景表达为一个连续的函数）。在实际应用中，使用这种implicit representations的模型需要使用很大的MLP，从而并不高效。因此，implicit和explicit representations都各自有各自的好处。
+
+local implicit representations以及hybrid explicit-implicit representations将这两种representations结合了起来。由这些研究工作启发，我们设计了一个新的hybrid explicit-implicit 3D-aware网络，其使用了一个memory高效的tri-plane representations来显式的存储axis-aligned planes上的features，然后这些features由一个轻量级的implicit feature decoder来将其综合起来，从而实现了高效的volume rendering，这个过程由fig2 c所示。我们所提出的representations和之前的plane-based hybrid architectures（[Unconstrained scene generation with locally conditioned radiance fields]，[Convolutional occupancy networks]）有一些相似的理念，但具体的设计是特别的。我们所提出的这个representations是我们的模型能够让3D GAN在real time时间内能生成高质量图片的关键。
+
+*Generative 3D-aware image synthesis*
+
+GAN现在在生成高质量的2D图片领域已经很成功了。而且将这样的效果推广到3D领域也已经在进行中了。基于mesh的方法使用的是计算机图形学领域最常见的数据类型，但其并不能生成高保真的2D图片。基于voxel的GAN直接将2D GAN里的CNN扩展到了3D领域。但voxel需要大量的存储空间，而且3D convolution计算缓慢，这些导致了训练3D GAN非常困难。低分辨率的3D GAN里的3D convlution计算可以被2D CNN的上采样层替换掉，但是这样的话就没有3D inductive bias了，从而结果就不具有view consistency。block-based稀疏volume representations克服了上述的某些困难，但是仅仅对于一些简单的场景效果好，而且很难泛化到其他场景里。除了这些显式的特征，还可以用MLP来学习隐式的特征，但由于需要使用较大的MLP，所以训练仍然很复杂，时间较长，从而还是限制了对于高分辨率以及复杂场景的3D GAN的训练。
+
+本文的一个最主要的见解就是一个有着3D inductive bias的高效3D GAN是生成高质量高分辨率且view consistent的图片的关键。而我们通过以下集中方式来实现了这样一个3D GAN模型。首先，和大多数3D GAN不同的是，我们直接使用了一个2D CNN-based feature generator，也就是StyleGAN2，从而就不再需要在voxel grids上进行低效的3D convolutions计算。其次，我们的tri-plane representations可以让我们将neural volume rendering作为一个inductive bias，但是要比NERF里的那种情况要高效很多。我们在进行neural rendering之后，仍然需要2D CNN-based upsampling操作，但我们使用了dual discrimination来避免了upsampling这样一个近似的计算所带来的view inconsistency。和现有的基于StyleGAN2的2.5D GANs不同（它们生成的是图片和其对应的深度图），我们的方法在各个角度都可以生成图片，也就是对整个3D场景都有了学习。
+
+现有的3D-aware GANs，比如StyleNeRF（[A style-based 3D-aware generator for high-resolution image synthesis]），CIPS-3D（[A 3D-aware Generator of GANs Based on Conditionally-Independent Pixel Synthesis]）等都已经给出了很impressive的图片效果了。而这些工作和我们的工作的最主要的区别在于，StyleNeRF和CIPS-3D主要在图片空间内操作，而很少强调3D representations，但我们的工作主要在3D空间内进行。我们的模型会生成更加view consistent的结果，并且还可以给出3D shapes。而且我们的模型在FFHQ和AFHQ数据集上有更好的FID image scores。
+
+![eg3d2]({{ '/assets/images/EG3D-2.PNG' | relative_url }})
+{: style="width: 800px; max-width: 100%;"}
+*Fig 2 (a) NeRF里的方法，使用MLP和positional encoding来隐式地表达一个场景，效率很低。(b) 显式的voxel grids和很小的implicit decoder来表示特征，这样会快很多，但是很难扩展到高分辨率的情况，因为voxel需要大量的存储空间。(c) 本文提出的representation，既快又好，可以生成高质量的高分辨率的图片。*
+
+
+**3. Tri-plane hybrid 3D representation**
+
+训练一个能生成高分辨率的GAN需要一个既高效又具有表达力的3D representation。在这一节里，我们将会介绍一个新的hybrid explicit-implicit tri-plane representation来提供上述这些优势。我们在这一节里对于一个单一场景的over fitting（SSO）实验来提出这样的一个representation，在之后的章节里再解释如何将其应用在我们的GAN框架里。
+
+在tri-plane的形势下，我们将显式的特征沿着三个正交轴的feature planes对齐，每个轴上的特征的size都是$$N \times N \times C$$，由fig 2 c表示，其中$$N$$是分辨率，$$C$$是通道数。对于空间中任意一个点的坐标$$x \in \mathbb{R}^3$$，我们将其投射到这三个平面上，从而得到了对应的三个feature vector，$$F_{xy}, F_{xz}, F_{yz}$$（如果不在节点上还要使用某种插值方法，比如bilinear interpolation），然后通过加和的方式将其综合起来，再通过一个轻量级的MLP来增加隐式的特征，最后输出color和density。最后再通过和NeRF一样的volume rendering操作得到图片。
+
+>也就是说，这里只需要学习三个平面上的feature就行了，也就是垂直于X，Y和Z轴的三个平面上的点的features，然后对于空间里任意一点，分别投射到这三个平面上，利用插值或者找最近的那个点，就作为空间中这一点在这个平面上的feature，也就是上面的$$F_{xy}, F_{xz}, F_{yz}$$。
+
+这种混合方法最大的一个优势就是高效，因为现在这个MLP就可以设计的很小，将模型的表达力转移到前面的explicit representations的部分（也就是三个平面分解的部分），从而大大减小了训练的难度，而且也不会丢失渲染精度。为了验证这个tri-plane representation确实是有效的，我们使用一个常见的novel-view synthesis来验证它。我们设置$$N=512, C=48$$，使用的MLP有四层，隐层的宽度是128，并且使用了一个Fourier feature encoding来对第一步的输入MLP前的特征进行处理。数据集是Tanks & Temples数据集。fig3和tab1展示了我们所提出的tri-plane representation的效果，其具有能够表达复杂场景的能力，而且计算量大大减小了。
+
+![eg3d3]({{ '/assets/images/EG3D-3.PNG' | relative_url }})
+{: style="width: 800px; max-width: 100%;"}
+*Fig 3 左边是NeRF的效果，中间是使用voxel的效果，右边是本文提出的representation的效果。*
+
+![tab1]({{ '/assets/images/EG3D-0.PNG' | relative_url }})
+{: style="width: 800px; max-width: 100%;"}
+
+tri-plane representations还有一个非常大的优势：这三个feature planes可以利用某种2D CNN-based generator得到（比如StyleGAN2），从而更加灵活。我们这一节的实验是在SSO设定下进行的，放在后面的GAN设定下，这样的优势会体现得更明显。
+
+
+**4. 3D GAN framework**
+
+有了一个高效以及具有表达力的3D representation之后，我们就可以从一系列2D图片里来训练一个3D GAN了，而不再需要其它的3D prior或者multi-view的监督信号来辅助。对于每张训练图片，我们使用某种pose detector（预训练好了的）来检测其的相机内部和外部参数。
+
+![eg3d4]({{ '/assets/images/EG3D-4.PNG' | relative_url }})
+{: style="width: 800px; max-width: 100%;"}
+*Fig 4 本文的3D GAN框架由几个部分组成：一个pose-conditioned StyleGAN2-based特征generator和一个mapping网络，一个tri-plane 3D representation以及配合的轻量级feature decoder，一个neural volume渲染器，一个super-resolution模块，以及一个有着dual discrimination的pose-conditioned StyleGAN2 discriminator。这样一个框架很好的将feature generation和neural volume rendering解耦开，从而可以很好的利用强大的StyleGAN2来提取特征。而且简洁而具有表达力的tri-plane representations也使得real time训练和推断这个框架变得可能。*
+
+fig 4是对整个模型框架的一个overview。我们使用上一个section提到的tri-plane representation来通过neural volume rendering来渲染图片，但是因为之前介绍tri-plane representation时用的是SSO的场景，所以在这个3D GAN训练的场景下还需要做一些修改。和SSO实验不同的是，在SSO实验里，各平面的features是由多个角度的输入来优化的，但在GAN的情况下，我们使用一个2D convolutional StyleGAN2来生成每个平面的features（在4.1里介绍）。而且我们也不是用neural volume rendering直接渲染出RGB图片，而是在得到了tri-plane representation之后，通过一个super-resolution模块来upsample所得到的结果（在4.2里介绍）。再之后，这张图片将会被一个StyleGAN2 discriminator所判断是真是假。整个框架是端到端进行训练的，随机初始化，使用了StyleGAN2里的训练策略。
+
+**4.1 CNN generator backbone and rendering**
+
+在这个GAN设定下所使用的tri-plane representation，是由一个StyleGAN2 CNN生成的。random latent code和相机参数被一个mapping网络接受，来产生一个intermediate latent code，其会作为StyleGAN2网络和super-resolution模块的一个输入。
+
+我们将原本的StyleGAN2的输入大小从三通道的RGB图片改成一个$$256 \times 256 \times 96$$的feature image。然后这96个通道分成三等分，从而得到了三个32通道的平面。
+
+再之后，我们在空间中随机采样点，然后投射到三个平面上，从而得到这个点的feature，通过加和综合在一起，再使用一个轻量级的decoder来处理。这个decoder是只有一个隐层的MLP，其输入并没有positional encoding，view direction input等。这个decoder的输出是一个标量的density $$\sigma$$以及一个32个通道的feature，再之后会利用一个neural volume渲染器来将这个3D的feature volume投影到2D上。
+
+volume rendering的过程和NeRF里的过程一样，有一点不同的是，volume rendering的输出结果是一个feature image，而不是RGB image，这一点和GIRAFFE那篇论文里一样。因为feature image含有更多的信息可以被用来进行super resolution的操作。
+
+**4.2 Super resolution**
+
+虽然tri-plane representation要比之前那些方法使用的representation在计算量上减少很多了，但在分辨率很高的时候仍然不够快。因此我们打算在一个适中的分辨率上进行volume rendering，然后再利用upsampling将所得到的RGB图片提到到更高的分辨率上。
+
+我们的super resolution模块有两个改动的StyleGAN2组成，其将32通道的feature image变成最终的RGB image。
+
+**4.3 Dual discrimination**
+
+和标准的2D GAN训练一样，最后的渲染结果由一个2D convolutional discriminator来判别。我们使用一个StyleGAN2的discriminator，但有两点改进。
+
+首先，我们引入了dual discrimination来避免multi-view inconsistency的问题。我们认为neural rendering的结果$$I_F \in \mathbb{R}^{128 \times 128 \times 32}$$的前三个通道是低分辨率的原图片，记这前三个通道构成的图片为$$I_{RGB}$$。直觉上看，dual discrimination保证了$$I_{RGB}$$和$$I_{RGB}^{'}$$之间的一致性（$$I_{RGB}^{'}$$是super resolution模块的输出。我们使用bilinear插值将$$I_{RGB}$$提升到和$$I_{RGB}^{'}$$一样的分辨率，然后沿着通道连接，从而构成了一个6通道的feature image，喂给discriminator来判别。而真实的图片，同样也先进行降采样，再利用同样的方法构造这样一个6通道的image喂给discriminator。这样的操作就叫做dual discrimination。
+
+dual discrimination不仅会使得最终的输出匹配真实图片的分布，还提供了额外的好处：它会使得neural rendering的结果匹配降采样的真实的图片的分布；其也会使得super resolution后的结果和neural rendering的结果保持一致，从fig 5可以看出。后一点很重要，因为其可以让我们在不引入新的view consistency的约束的情况下，使用super resolution这个模块。
+
+>因为对于真实的图片，其要经过降采样，再通过bilinear插值升采样，再连接成6通道的image作为一个数据，其前三个通道和后三个通道有很强的联系（基本就是一样的，模糊版本），而且真实的图片的例子是view consistent的。从而经过训练，neural rendering所得到的结果的最后三个通道需要和真实图片的最后三个通道的分布相匹配，从而就view consistent了。而真实图片的前三个通道和后三个通道相似，从而super resolution的结果也就需要和neural rendering的结果相似，从而就具有了view consistency的效果。
+
+![eg3d5]({{ '/assets/images/EG3D-5.PNG' | relative_url }})
+{: style="width: 800px; max-width: 100%;"}
+*Fig 5 dual discrimination保证$$I_{RGB}$$和$$I_{RGB}^{'}$$保持一致，从而使得高分辨率的结果保证了multi-view-consistent的特性。*
+
+而且，我们的discriminator是有相机参数输入这个信息的。
+
+**4.4 Modeling pose-correlated attributes**
+
+大多数的现实的数据集比如FFHQ包含一些bias，其会将相机参数和其他一些特性相关联起来（比如facial expression），如果不小心处理就会导致view inconsistency。比如说，有关人脸的相机参数就和smile有关。我们必须处理这些特征，将其解耦，才能够更好的生成质量更好的图片。
+
+我们提出了generator pose conditioning作为对pose和其它特征之间的关系的建模和解耦方法。为了实现这个目标，mapping network的输入不仅是一个latent code vector $$z$$，还加入了相机参数$$P$$。通过给mapping network提供相机参数，我们允许相机参数来影响生成的结果。
+
+在训练过程中，上述的pose conditioning使得generator可以对数据集里的pose-dependent的bias进行建模，从而我们的模型就可以更加真实的匹配原数据集里的分布。
+
+
+**5. Experiments and results**
+
+
+**6. Discussion**
 
 
 
