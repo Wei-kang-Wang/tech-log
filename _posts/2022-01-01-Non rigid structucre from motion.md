@@ -19,6 +19,8 @@ tags: paper-reading
 
 ## 1. [Piecewise Planar Hulls for Semi-supervised Learning of 3D Shape and Pose from 2D Images](https://arxiv.org/pdf/2211.07491.pdf)
 
+*Arxiv 2022*
+
 **Abstract**
 
 作者研究了如何从单张2D图片，通过keypoints来估计3D shape和pose的问题。3D shape和pose是直接从按类划分的图片以及图片中物体的部分2D keypoints标注上获取的。在这篇文章里，作者首先提出了一个端到端的训练框架来进行intermediate 2D keypoints的获取以及最终的3D shape和pose的估计。再之后，上述这个框架再由这些intermediate 2D keypoints作为监督信号来训练。而且，作者还设计了一种半监督的训练方法，其可以从有标注和无标注的数据中都获益。为了能够使用无标住的数据，作者使用了piece-wise planar hull prior来为标准的object shape提供约束。这些planar hulls是借由keypoints来为每一类物体定义的（不是每一个）。一方面，所提出的框架学习如何从有标注的数据里来获取每类物体的planar hull。另一方面，框架也要求对于无标住的数据，其keypoints和hulls需要和有标注的那些保持consistent。这种consistency约束使得我们可以充分利用那些无标注的数据。本文所提出的方法和那些sota的监督方法所得到的结果效果差不多，但只需要使用一半的标注。
@@ -125,10 +127,37 @@ Monte Carlo Dropout是一种被广泛使用的度量不确定性的方法。具�
 
 
 
+## 2. [C3DPO: Canonical 3D Pose Networks for Non-Rigid Structure From Motion](https://openaccess.thecvf.com/content_ICCV_2019/papers/Novotny_C3DPO_Canonical_3D_Pose_Networks_for_Non-Rigid_Structure_From_Motion_ICCV_2019_paper.pdf)
+
+*ICCV 2019*
+
+[[CODE](https://github.com/facebookresearch/c3dpo_nrsfm)]
+[[PAGE](https://research.facebook.com/publications/c3dpo-canonical-3d-pose-networks-for-non-rigid-structure-from-motion/)]
 
 
+## 3. [Unsupervised Learning of Probably Symmetric Deformable 3D Objects from Images in the Wild](https://openaccess.thecvf.com/content_CVPR_2020/papers/Wu_Unsupervised_Learning_of_Probably_Symmetric_Deformable_3D_Objects_From_Images_CVPR_2020_paper.pdf)
+
+*CVPR 2020 Best Paper*
+
+[[CODE](https://github.com/elliottwu/unsup3d)]
+[[PAGE](https://elliottwu.com/projects/20_unsup3d/)]
 
 
+## 4. [Procrustean Regression Networks: Learning 3D Structure of Non-Rigid Objects from 2D Annotations](https://arxiv.org/pdf/2007.10961.pdf)
+
+*ECCV 2020*
+
+[[CODE](https://github.com/sungheonpark/PRN)]
+
+
+## 5. [Deep Non-Rigid Structure from Motion](https://openaccess.thecvf.com/content_ICCV_2019/papers/Kong_Deep_Non-Rigid_Structure_From_Motion_ICCV_2019_paper.pdf)
+
+*ICCV 2019*
+
+
+## 6. [Lifting autoencoders: Unsupervised learning of a fully-disentangled 3d morphable model using deep non-rigid structure from motion](https://openaccess.thecvf.com/content_ICCVW_2019/papers/GMDL/Sahasrabudhe_Lifting_AutoEncoders_Unsupervised_Learning_of_a_Fully-Disentangled_3D_Morphable_Model_ICCVW_2019_paper.pdf)
+
+[[POST](https://msahasrabudhe.github.io/projects/lae/)]
 
 
 
