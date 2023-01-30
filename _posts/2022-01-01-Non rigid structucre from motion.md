@@ -81,14 +81,14 @@ $$\min\limits_{\alpha_i, B, R_i \in SO(3)} \sum\limits_{i=1}^{n} L(Y_i \circ \ze
 
 **3.2 Motivation**
 
-在本文的设定下，我们有$$N_L$$张有2D keypoints标注的图片，$$N_U$$张没有2D keypoints标注的图片。将有标注的和无标注的图片分别叫做$$D_L$$和$$D_U$$。ground truth的2D keypoints叫做$$\bar{Y_{\text{D_L}}}$$。本文的目标是直接从图片来预测3D keypoints，将有标注的图片的3D keypoints预测结果记为$$\hat{X_{\text{D_L}}}$$，将无标注的图片的3D keypoints的预测结果记为
-$$\hat{X_{\text{D_U}}}$$，基于上述的公式(2)，我们的损失函数就是：
+在本文的设定下，我们有$$N_L$$张有2D keypoints标注的图片，$$N_U$$张没有2D keypoints标注的图片。将有标注的和无标注的图片分别叫做$$D_L$$和$$D_U$$。ground truth的2D keypoints叫做$$\bar{Y_{D_L}}$$。本文的目标是直接从图片来预测3D keypoints，将有标注的图片的3D keypoints预测结果记为$$\hat{X_{D_L}}$$，将无标注的图片的3D keypoints的预测结果记为
+$$\hat{X_{D_U}}$$，基于上述的公式(2)，我们的损失函数就是：
 
-$$\min\limits_{\alpha_i, B, R_i \in SO(3)} \sum\limits_{i=1}^{N_L} L(\bar{Y_{\text{D_L}}^{\text{i}}} \circ \zeta_{z_i}, \Pi \hat{X_{\text{D_L}}^{\text{i}}} \circ \zeta_{z_i}) + \sum\limits_{i=1}^{N_U} L(\bar{Y_{\text{D_U}}^{\text{i}}} \circ \zeta_{z_i}, \Pi \hat{X_{\text{D_U}}^{\text{i}}} \circ \zeta_{z_i})$$
+$$\min\limits_{\alpha_i, B, R_i \in SO(3)} \sum\limits_{i=1}^{N_L} L(\bar{Y_{D_L}^{i}} \circ \zeta_{z_i}, \Pi \hat{X_{D_L}^{i}} \circ \zeta_{z_i}) + \sum\limits_{i=1}^{N_U} L(\bar{Y_{D_U}^{i}} \circ \zeta_{z_i}, \Pi \hat{X_{D_U}^{i}} \circ \zeta_{z_i})$$
 
-但上述公式存在的问题是，我们并没有$$\bar{Y_{\text{D_U}}}$$。因此，我们就需要想办法对于无标注的那些图片，获取2D keypoints的假标签来代替$$\bar{Y_{\text{D_L}}}$$。为了达成这个目标，作者提出了一个代理任务：预测semantic planar hulls。
+但上述公式存在的问题是，我们并没有$$\bar{Y_{D_U}}$$。因此，我们就需要想办法对于无标注的那些图片，获取2D keypoints的假标签来代替$$\bar{Y_{D_L}}$$。为了达成这个目标，作者提出了一个代理任务：预测semantic planar hulls。
 
-总体来说，本文所提出的模型，以图片作为输出，输出有三部分：（i）一个原图片输入的segmentation；（ii）2D keypoints的locations；（iii）2D keypoints的对应的3D信息。将上述模型表示为：$$T(\textit{I}) = (S,Y,X)$$，其中$$\textit{I} \in \mathbb{R}^{H \times W \times 3}$$是输入的图片，$$S \in \mathbb{R}^{H \times W \times s}$$是segmentation mask的logits（也就是分成$$s$$个部分），$$Y \in \mathbb{R}^{k \times 2}$$是2D keypoints的坐标，$$X \in \mathbb{R}^{k \times 3}$$是3D keypoints的坐标。模型里的segmentation branch的输入是3D piecewise planar hulls的2D projections，而不是原图片。segmentation的结果会和2D以及3D keypoints预测结果结合起来用来预测$$\bar{Y_{\text{D_U}}}$$。这样就可以让我们利用起来那些无标注的数据，进行这种半监督的学习。
+总体来说，本文所提出的模型，以图片作为输出，输出有三部分：（i）一个原图片输入的segmentation；（ii）2D keypoints的locations；（iii）2D keypoints的对应的3D信息。将上述模型表示为：$$T(\textit{I}) = (S,Y,X)$$，其中$$\textit{I} \in \mathbb{R}^{H \times W \times 3}$$是输入的图片，$$S \in \mathbb{R}^{H \times W \times s}$$是segmentation mask的logits（也就是分成$$s$$个部分），$$Y \in \mathbb{R}^{k \times 2}$$是2D keypoints的坐标，$$X \in \mathbb{R}^{k \times 3}$$是3D keypoints的坐标。模型里的segmentation branch的输入是3D piecewise planar hulls的2D projections，而不是原图片。segmentation的结果会和2D以及3D keypoints预测结果结合起来用来预测$$\bar{Y_{D_U}}$$。这样就可以让我们利用起来那些无标注的数据，进行这种半监督的学习。
 
 **3.3 Piecewise Planar Hulls**
 
@@ -105,7 +105,7 @@ PPH可以被用来产生segmentation。给定了2D keypoints坐标之后，就�
 
 **3.4 Cross Consistency between Keypoints and Planar Hulls**
 
-为了能够使用那些无标注的数据，作者研究了keypoints和planar hulls的语义之间的consistency。这是通过从网络的输出结果中交替的获取segmentation假标签$$\bar{S_{\text{D_U}}}$$以及2D keypoints假标签$$\bar{Y_{\text{D_U}}}$$来实现的。作者提出了两个模块：（i）2D keypoints假标签的生成；（ii）语义假标签的生成（也就是segmentation假标签）。这些假标签就可以用来self-supervise网络的训练。具体这个流程在下面介绍。
+为了能够使用那些无标注的数据，作者研究了keypoints和planar hulls的语义之间的consistency。这是通过从网络的输出结果中交替的获取segmentation假标签$$\bar{S_{D_U}}$$以及2D keypoints假标签$$\bar{Y_{D_U}}$$来实现的。作者提出了两个模块：（i）2D keypoints假标签的生成；（ii）语义假标签的生成（也就是segmentation假标签）。这些假标签就可以用来self-supervise网络的训练。具体这个流程在下面介绍。
 
 
 **4. Psudo-label Generation and Semi-supervised Learning**
