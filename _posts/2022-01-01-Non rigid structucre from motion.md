@@ -98,6 +98,31 @@ $$\min\limits_{\alpha_i, B, R_i \in SO(3)} \sum\limits_{i=1}^{N_L} L(\bar{Y_{\te
 
 另一个重点是对称的planes。比如说，car的左右两侧planes就是对称的，而且是相同的。但是，理论上我们是需要区分这两个平面的，比如通过汽车的前挡风平面，我们就可以区分左右两个车身平面。为了让模型能够学习到这点，作者使用了Coordiante convolutions。
 
+PPH可以被用来产生segmentation。给定了2D keypoints坐标之后，就可以按照预先设定的这一类的PPH来找到这张图片的PPH结果。对于有标注的图片，既然有了2D keypoints的位置了，那么根据这些keypoints位置就可以定义PPH里的planes，根据网络预测的3D keypoints结果，就可以根据这些3D keypoints也找到PPH的那些planes。对于无标注的图片，3D的PPH planes是一样的，而2D的PPHD planes则根据网络给出的2D keypoints结果来获得。从而，对于任意一张图片（不管有无标注），现在我们都有了两个PPH：2D的和3D的。因为每一类物体的PPH是预先设定的，segmentation结果也可以是预先设定好的，从而就可以用上述的结果来训练这个segmentation分支（segmentation要分成多少部分，也就是PPH有多少个平面，这是个超参数）。将物体类别$$z$$的PPH的planes个数表示为$$s_z$$，那么segmentation分支的分割部分数量就是$$s = \Sigma_{z} s_z + 1$$，其中多出来的那个表示的是背景。
+
+
+**3.4 Cross Consistency between Keypoints and Planar Hulls**
+
+为了能够使用那些无标注的数据，作者研究了keypoints和planar hulls的语义之间的consistency。这是通过从网络的输出结果中交替的获取segmentation假标签$$\bar{S_{\text{D_U}}}$$以及2D keypoints假标签$$\bar{Y_{\text{D_U}}}$$来实现的。作者提出了两个模块：（i）2D keypoints假标签的生成；（ii）语义假标签的生成（也就是segmentation假标签）。这些假标签就可以用来self-supervise网络的训练。具体这个流程在下面介绍。
+
+
+**4. Psudo-label Generation and Semi-supervised Learning**
+
+**4.1 Semantic Psedo-label Generation**
+
+假设模型$$T$$是由有标签的数据来训练的。那么segmentation mask branch就可以用由2D keypoints位置得到的ground truth planes来约束，2D keypoint detection branch就可以用ground truth的2D keypoint locations来约束，3D keypoint branch就可以用之前所说的公式2的reprojection loss来约束。因此，整个网络在有了ground truth 2d keypoint locations之后就可以进行训练了。
+
+但如果我们需要利用无标签的数据也参与训练的话，就需要在segmentation mask branch的训练上使用假标签。具体来说，每个像素点都有$$s+1$$种分类可能（$$s+1$$类），表示的是$$s$$个planes和背景。
+
+* Monte Carlo Dropout
+Monte Carlo Dropout是一种被广泛使用的度量不确定性的方法。具体来说，在模型$$T$$里，我们在segmentation branch里使用dropout，然后运行整个网络$$N_D$$次，dropout的概率是$$p_D$$。从而对于segmentation branch的输出，我们就获得了一个大小为$$N_D \times H \times W \times s$$的矩阵，叫做logits matrix，记为$$R_D$$。然后使用Welch's t-test对于每个像素点都进行一波处理，最终得到每个像素点的假标签。
+
+* Visibility
+网络预测的3D keypoint可以用来建立plane visibility。
+
+* Plane Estimation Agreement
+网络预测的2D keypoint也可以用来建立planes。
+
 
 
 
