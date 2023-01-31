@@ -325,7 +325,15 @@ $$\frac{\partial \mathcal{J}}{\partial X} = \frac{\partial f}{\partial X} + \lam
 
 **3.3 $$f$$和$$g$$的设计**
 
+对于训练网络的objective里的data term $$f$$，我们使用所预测的3D shapes和ground truth的2D keypoints之间的reprojection error来衡量。在这篇文章里，我们考虑的是orthographic projection，考虑perspective projection也是一样的。$$f$$的具体计算方式如下：
 
+$$f(X) = \sum\limits_{i=1}^{n_f} \frac{1}{2} \lVert (U_i - P_o X_i ) \odot W_i \rVert_F^2$$
+
+这里的$$P_o = \begin{pmatrix}
+1 & 0 & 0 \\
+0 & 1 & 0
+\end{pmatrix}$$
+是一个大小为$$2 \times 3$$ orthographic projection matrix，
 
 
 
