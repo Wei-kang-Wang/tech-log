@@ -289,7 +289,7 @@ $$J = \sum\limits_{i=1}^{n_f} f(X_i) + \lambda g(\tilde{X}, \bar{X})$$
 
 其中$$X_i \in \mathbb{3 \times n_p}$$是第i张图片的3D shape，$$\bar{X}$$是Procrustes analysis的reference shape，$$\tilde{X} \in \mathbb{R}^{3n_p \times n_f}$$是aligned后的shape堆成的矩阵，也就是$$\tilde{X} = \left[ vec(\tilde{X_1}, vec(\tilde{X_2}, \cdots, vec(\tilde{X_{n_f}}), \right]$$，其中$$\tilde{X_i}$$表示第i个经过aligned之后的shape。而这些aligned shape $$\tilde{X_i}$$则是由Procrustes analysis计算得来的（没有考虑scaling）。换句话说，每个aligned shape的aligning rotation matrix是以如下的方式计算出来的：
 
-$$R_i = \argmin\limits_{R} \lVert RX_iT - \bar{X} \rVert$$
+$$R_i = \mathop{\arg\min}\limits_{R} \lVert RX_iT - \bar{X} \rVert$$
 
 其中$$R^TR = I$$。上述式子里的$$T = I_{n_p} - \frac{1}{n_p} 1_{n_p} 1_{n_p}^T$$是使得shape位于图片中间的translation matrix。从而，对于每个预测的3D shape $$X_i$$，经由上述Procrustes analysis align之后得到的结果就是$$\tilde{X_i} = R_i X_i T$$。
 
@@ -314,7 +314,7 @@ $$\mathcal{J} = \sum\limits_{i=1}^{n_f} f(X_i) + \lambda g(\tilde{X})$$
 
 因为$$\bar{X}$$变了，所以procurstes analysis所计算的rotation也会变成：
 
-$$R = \argmin\limits_{R} \sum\limits_{i=1}^{n_f} \lVert R_i X_i T - \frac{1}{n_f} \sum\limits_{j=1}^{n_f} R_jX_j T \rVert$$
+$$R = \mathop{\arg\min}\limits_{R} \sum\limits_{i=1}^{n_f} \lVert R_i X_i T - \frac{1}{n_f} \sum\limits_{j=1}^{n_f} R_jX_j T \rVert$$
 
 其中$$R_i^T R = I$$，$$R$$是所有的这样的$$R_i$$的concatenation：$$R = \left[ R_1, R_2, \cdots, R_{n_f} \right]$$。我们记$$X = \left[ vec(X_1), vec(X_2), \cdots, vec(X_{n_f}) \right]$$为所有的网络输出的未经过aligned的3D shapes构成的矩阵，记$$\tilde{X} = \left[ vec(\tilde{X_1}), vec(\tilde{X_2}), \cdots, vec(\tilde{X_{n_f}}) \right]$$为经过aligned之后的3D shapes构成的矩阵。从而$$\mathcal{J}$$相对于$$X$$的导数为：
 
