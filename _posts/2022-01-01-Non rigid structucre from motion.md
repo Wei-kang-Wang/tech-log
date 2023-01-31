@@ -258,6 +258,77 @@ $$J_{uv} = (k_s + k_d max \lbrace 0, \langle l, n_{uv} \rangle \rbrace) \dot a_{
 
 [[CODE](https://github.com/sungheonpark/PRN)]
 
+**Abstract**
+我们提出了一个从2D annotations上学习non-rigid物体的3D information的框架。最近有一些工作利用deep learning来研究NrSfM问题，从而实现3D reconstruction。NrSfM的最大的难点在于需要同时预测rotation和deformation，而之前的那些工作同时regress这两个变量。在这篇文章里，我们提出一个方法来自动计算好rotation。训练所用的cost function由一个reprojection error和aligned shapes的low rank term所组成，训练好的网络可以学习到物体的3D structures，比如说human skelotons或者faces，而inference只需要输入一张图片就可以了。而且本文提出的方法还可以处理有missing entries的输入（也就是2D keypoints不完整）。实验表明本文所提出的方法在Human 3.6M，300-VW和SURREAL数据集上都达到了sota的效果，即使我们的backbone网络十分简单。
+
+
+**1. Introduction**
+
+从一批2D keypoints数据里推断3D poses是一个理论上约束过少的问题（也就是说理论上无法得到最优解）。尤其是对于那些non-rigid物体，比如说human faces或者human bodies，从2D keypoints里推测3D poses就更难了，因为物体本身还会有deformations。
+
+目前有两种不同的方法从non-rigid物体的2D keypoints里获取3D shapes。第一种方法是使用某种3D reconstruction算法。NrSfM算法就是从一系列2D的keypoints里reconstruct non-rigid物体的3D shapes的算法。不过NrSfM算法并没有任何3D shape priors，所以其对于每个物体的2D keypoints输入，都需要独立的去处理，从而算法时间复杂度高。第二种方法是利用3D ground truth的数据，来学习从2D到3D的mapping。最近的方法都是使用神经网络来实现2D-3D或者image-3D的mapping的学习。然而，3D ground truth数据是很难获取的，这就大大限制了这类监督方法的应用前景。
+
+我们考虑，还存在另一种可能性：也就是一个将上述两种方法结合起来的框架，也就是利用deep learning来解决NrSfM。实际上，在这个方向已经有一部分工作了：[Unsupervised 3d reconstruction networks]()，[Deep non-rigid structure from motion]()，但是这些方法所研究的都是structure-from-category（SfC）问题，也就是输入的是同一个种类的不同个体的图片，而这些个体之间的deformation实际上很小。在上述文章里的实验证明，当deformation很大的时候，他们的算法的generalization效果不是很好。最近，[C3DPO: Canonical 3d Pose Networks for non-rigid structure from motion]()提出了一个网络，利用校准3D shapes来获得3D rigid motion，从单张图片里获取3D shapes。这篇论文里的方法对于更多种类的deformation效果更好。[Distill Knowledge from nrsfm for weakly supervised 3d pose learning]()利用知识蒸馏的方式从2D keypoints里获取3D shapes信息。
+
+NrSfM的主要困难在于模型需要同时预测rigid motion和non-rigid deformation，而这个困难在过去的20年里被深入的讨论和研究过。更难的是，motion和deformation有时候会被混淆，变得难以区分。之前有工作利用generalized procrustes analysis来解决这个问题。然而，最近的这些deep NrSfM都是同时来预测motion和deformation的。在这些方法里，只有[C3DPO: Canonical 3d Pose Networks for non-rigid structure from motion]()考虑了motion和deformation的分离问题。
+
+在这篇文章里，我们提出了一个新的方法来解决NrSfM问题：首先，我们证明一系列经过procrustes aligned后的shapes是transversal的。从而，我们就不需要显式的估计rigid motions，而是通过一个loss来约束。从而，我们就可以使得网络专注于预测3D shapes了，从而我们只需要比较简单的网络结构。我们所提出的框架，procrustean regression network (PRN)，就可以只从2D keypoints输入里获取3D structure了。
+
+fig 1说明了所提出的框架的流程。PRN以一系列图片或者2D keypoints作为输入。PRN训练所用的objective function是由reprojection error和aligned shapes之间的距离所组成的。整个训练过程是端到端的，而在inference的时候，只需要输入一张图片或者2D keypoints的sequence，就可以直接生成3D structure。大量的实验证明了我们所提出的方法的可信性。
+
+
+**3. Method**
+
+我们在3.1里将会介绍procrustean regression，其是基于procrustes-aligned shapes的regression，是PRN的基础。而且，我们还会介绍C3DPO那篇文章里所提到的shape transversality的概念，然后证明我们所得到的procrustes-aligned shapes是transversal的，从而证明Procrustes analysis是可以从shapes里恢复motion的。3.2将会介绍PRN的objective。3.3介绍训练时需要的额外的regularization term。3.4介绍网络结构以及训练方法。
+
+**3.1 Procrustean Regression**
+
+NrSfM的目标是从物体的2D keypoints里恢复3D shapes。具体来说，输入有$$n_f$$张图片，每张图片有$$n_p$$个2D keypoints，将其表示为$$U_i \in \mathbb{R}^{2 \times n_p}$$，其中$$1 \leq i \leq n_f$$，NrSfM的目的是对于每张图片，恢复其3D structure $$X_i \in \mathbb{R}^{3 \times n_p}$$。Procrustean regression（PR）将NrSfM问题表述为一个regression问题。PR的objective包含一个reprojection error和regularization term，前者用于衡量投影后的3D shapes和2D keypoints之间的差距，后者用于约束aligned shapes为一个low rank的矩阵：
+
+$$J = \sum\limits_{i=1}^{n_f} f(X_i) + \lambda g(\tilde{X}, \bar{X})$$
+
+其中$$X_i \in \mathbb{3 \times n_p}$$是第i张图片的3D shape，$$\bar{X}$$是Procrustes analysis的reference shape，$$\tilde{X} \in \mathbb{R}^{3n_p \times n_f}$$是aligned后的shape堆成的矩阵，也就是$$\tilde{X} = \left[ vec(\tilde{X_1}, vec(\tilde{X_2}, \cdots, vec(\tilde{X_{n_f}}), \right]$$，其中$$\tilde{X_i}$$表示第i个经过aligned之后的shape。而这些aligned shape $$\tilde{X_i}$$则是由Procrustes analysis计算得来的（没有考虑scaling）。换句话说，每个aligned shape的aligning rotation matrix是以如下的方式计算出来的：
+
+$$R_i = \argmin\limits_{R} \lVert RX_iT - \bar{X} \rVert$$
+
+其中$$R^TR = I$$。上述式子里的$$T = I_{n_p} - \frac{1}{n_p} 1_{n_p} 1_{n_p}^T$$是使得shape位于图片中间的translation matrix。从而，对于每个预测的3D shape $$X_i$$，经由上述Procrustes analysis align之后得到的结果就是$$\tilde{X_i} = R_i X_i T$$。
+
+公式1里的$$\bar{X}$$和$$X_i$$将均作为输出被优化（并不需要自行计算$$\bar{X}$$）。
+
+**3.1.1 Transversal property**
+
+接下来我们介绍C3DPO这篇文章里所说的transversal property。
+
+**Definition 1** 如果对于集合$$\mathcal{X_0} \in \mathbb{R}^{3 \times n_p}$$里的任意两个元素$$X,X^{'}$$，$$X^{'} = RX$$，那么$$X=X^{'}$$，那么就说这个集合$$\mathcal{X_0}$$具有transversal property。
+
+上述的定义也就是说，对于一个具有transversal property的shape集合，它里面任意两个shape都不可能通过rigid transformation使它们完全重合，也就是说可以认为里面所有的shape都有canonical rigid pose。而我们可以发现，经过procrustes analysis之后的shape集合，就具有transversal property。
+
+
+**3.2 PR loss for neural networks**
+
+我们可以直接构建一个神经网络来预测公式1里的3D shape $$X_i$$和reference shape $$\bar{X}$$。然而，reference shapes在这种情况下可能会有一些问题。如果我们所处理的物体类别并不会有大的deformations，那么将reference shape作为一个global parameter是可行的。但如果它有较大的deformations（比如说human body），那训练的时候每个minibatch里的shapes不能够有较大的deformations就显得很重要（也就是每个minibatch里的shapes要相似）。在这种情况下，一个独立的来预测一个好的3D reference shape的模块就显得很重要。然而，多出来这样的一个模块会使得训练变得更加困难。为了让网络变得简单，我们不再将公式1里的$$\bar{X}$$当作一个需要被学习的输出，而是利用aligned 3D shapes的mean来表示它。从而$$\bar{X} = \sum\limits_{j=1}^{n_f} R_j X_j T$$。现在，$$X_i$$成了公式1里唯一需要被学习的输出，而objective $$J$$对于$$X_i$$的导数，$$\frac{\partial J}{\partial X_i}$$可以被理论计算出来。
+
+从而PRN的objective就可以重写为：
+
+$$\mathcal{J} = \sum\limits_{i=1}^{n_f} f(X_i) + \lambda g(\tilde{X})$$
+
+因为$$\bar{X}$$变了，所以procurstes analysis所计算的rotation也会变成：
+
+$$R = \argmin\limits_{R} \sum\limits_{i=1}^{n_f} \lVert R_i X_i T - \frac{1}{n_f} \sum\limits_{j=1}^{n_f} R_jX_j T \rVert$$
+
+其中$$R_i^T R = I$$，$$R$$是所有的这样的$$R_i$$的concatenation：$$R = \left[ R_1, R_2, \cdots, R_{n_f} \right]$$。我们记$$X = \left[ vec(X_1), vec(X_2), \cdots, vec(X_{n_f}) \right]$$为所有的网络输出的未经过aligned的3D shapes构成的矩阵，记$$\tilde{X} = \left[ vec(\tilde{X_1}), vec(\tilde{X_2}), \cdots, vec(\tilde{X_{n_f}}) \right]$$为经过aligned之后的3D shapes构成的矩阵。从而$$\mathcal{J}$$相对于$$X$$的导数为：
+
+$$\frac{\partial \mathcal{J}}{\partial X} = \frac{\partial f}{\partial X} + \lambda \langle \frac{\partial g}{\partial \tilde{X}}, \frac{\partial \tilde{X}}{\partial X} \rangle$$
+
+其中$$\frac{\partial \tilde{X}}{\partial X}$$是可以被计算出来的（仅和$$X_i$$有关）。
+
+
+**3.3 $$f$$和$$g$$的设计**
+
+
+
+
+
 
 ## 5. [Deep Non-Rigid Structure from Motion](https://openaccess.thecvf.com/content_ICCV_2019/papers/Kong_Deep_Non-Rigid_Structure_From_Motion_ICCV_2019_paper.pdf)
 
@@ -265,6 +336,8 @@ $$J_{uv} = (k_s + k_d max \lbrace 0, \langle l, n_{uv} \rangle \rbrace) \dot a_{
 
 
 ## 6. [Lifting autoencoders: Unsupervised learning of a fully-disentangled 3d morphable model using deep non-rigid structure from motion](https://openaccess.thecvf.com/content_ICCVW_2019/papers/GMDL/Sahasrabudhe_Lifting_AutoEncoders_Unsupervised_Learning_of_a_Fully-Disentangled_3D_Morphable_Model_ICCVW_2019_paper.pdf)
+
+*ICCV Workshop 2019*
 
 [[POST](https://msahasrabudhe.github.io/projects/lae/)]
 
