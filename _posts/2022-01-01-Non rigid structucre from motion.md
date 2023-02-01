@@ -333,7 +333,9 @@ $$f(X) = \sum\limits_{i=1}^{n_f} \frac{1}{2} \lVert (U_i - P_o X_i ) \odot W_i \
 1 & 0 & 0 \\
 0 & 1 & 0
 \end{pmatrix}$$
-是一个大小为$$2 \times 3$$ orthographic projection matrix，
+是一个大小为$$2 \times 3$$ orthographic projection matrix，$$U_i$$是一个$$2 \times n_p$$的矩阵，表示2D keypoints ground truth。$$W_i$$是一个$$2 \times n_p$$的weight矩阵，第$$i$$列表示对于第$$i$$个keypoint的confidence，$$W_i$$里的值范围在0到1，0表示这个keypoints因为occlusion而看不到。2D keypoint detectors的scores可以被用来生成$$W_i$$。上述公式里的$$\odot$$表示element-wise multiplication。
+
+对于regularization term，也就是$$g$$，我们对于aligned的shapes加上一个low-rank约束。常用的两种方法是log-determinant和nuclear norm（矩阵奇异值的和）。
 
 
 
