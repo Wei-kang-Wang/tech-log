@@ -189,7 +189,7 @@ lighting的效果也可以被结合在albedo $$a$$里面，我们只需要将$$a
 
 在3D reconstruction任务里使用对称性，需要在图片里找到对称的点对。在这篇文章里，我们隐式的进行这样的操作，假设depth和albedo，关于某个竖直的平面对称。这样做的一个好处是，这是的模型能够发现物体的一个canonical view，对于3D reconstruction有帮助。
 
-为了实现这个目标，我们考虑一个operator，其将一个map $$a \in \mathbb{R}^{C \times W \times H}$$沿着一个horizontal axis进行翻转：$$\left[flipa \right]\limits_{c,u,v} = a_{c,W-1-u, v}$$。我们需要$$d \approx flipd$$，以及$$a \approx flipa$$。尽管这样的对称性可以通过在objective上显式加上约束来实现，但这样的话会引入超参数，使得调参变得困难。所以，我们与其那样做，不如用一种非直接的方法实现上述效果，我们可以从反转的depth和albedo获取另一个reconstruction $$\hat{I^{'}}$$：
+为了实现这个目标，我们考虑一个operator，其将一个map $$a \in \mathbb{R}^{C \times W \times H}$$沿着一个horizontal axis进行翻转：$$\left[ flipa \mathop{\right]}\limits_{c,u,v} = a_{c,W-1-u, v}$$。我们需要$$d \approx flipd$$，以及$$a \approx flipa$$。尽管这样的对称性可以通过在objective上显式加上约束来实现，但这样的话会引入超参数，使得调参变得困难。所以，我们与其那样做，不如用一种非直接的方法实现上述效果，我们可以从反转的depth和albedo获取另一个reconstruction $$\hat{I^{'}}$$：
 
 $$\hat{I^{'}} = \Pi(\Lambda(a^{'}, d^{'}, l), d^{'}, w)$$
 
