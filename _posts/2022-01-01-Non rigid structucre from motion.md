@@ -173,7 +173,7 @@ Monte Carlo Dropout是一种被广泛使用的度量不确定性的方法。具�
 
 **3.1 Photo-Geometric Autoencoding**
 
-一张图片$$I$$是一个function $$\Omega \rightarrow \mathbb{R}^3$$，定义在一个grid $$\Omega = \lbrace 0, 1, \cdots, W-1 \rbrace \times \lbrace 0,1,\cdots,H-1 \rbrace$$上，或者等价地说，一张图片是一个大小为$$\mathbb{R}^{3 \times W \times H}$$的tensor。我们假设图片内的物体大致在图片中心。我们的目标是学习一个function　$$\Phi$$，用神经网络来实现，将图片$$I$$映射到一个四元组$$(d,a,w,l)$$，其中$$d$$是一个depth map，$$d: \Omega \rightarrow \mathbb{R_{+}}；$$a$$是albedo（反射），$$\Omega \rightarrow \mathbb{R}^3$$；$$w$$是viewpoint，$$w \in \mathbb{R}^6$$；$$l$$是global light direction，$$l \in \mathbb{S}^2$$。然后再从这个四元组，重构原输入图片。
+一张图片$$I$$是一个function $$\Omega \rightarrow \mathbb{R}^3$$，定义在一个grid $$\Omega = \lbrace 0, 1, \cdots, W-1 \rbrace \times \lbrace 0,1,\cdots,H-1 \rbrace$$上，或者等价地说，一张图片是一个大小为$$\mathbb{R}^{3 \times W \times H}$$的tensor。我们假设图片内的物体大致在图片中心。我们的目标是学习一个function　$$\Phi$$，用神经网络来实现，将图片$$I$$映射到一个四元组$$(d,a,w,l)$$，其中$$d$$是一个depth map，$$d: \Omega \rightarrow \mathbb{R_{+}}$$；$$a$$是albedo（反射），$$\Omega \rightarrow \mathbb{R}^3$$；$$w$$是viewpoint，$$w \in \mathbb{R}^6$$；$$l$$是global light direction，$$l \in \mathbb{S}^2$$。然后再从这个四元组，重构原输入图片。
 
 从这个四元组重构原图片的步骤分为两步：(i) lighting $$\Lambda$$和(ii) reprojection $$\Pi$$，如下所示：
 
