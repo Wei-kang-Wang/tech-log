@@ -134,6 +134,86 @@ Monte Carlo Dropout是一种被广泛使用的度量不确定性的方法。具�
 [[CODE](https://github.com/facebookresearch/c3dpo_nrsfm)]
 [[PAGE](https://research.facebook.com/publications/c3dpo-canonical-3d-pose-networks-for-non-rigid-structure-from-motion/)]
 
+**Abstract**
+
+我们提出C3DPO，一个从2D keypoint annotations里获取deformable objects的3D models的算法。我们训练了一个神经网络来一次从单张图片来reconstruct一个3D object，而且显式的将由于viewpoint变化和object deformation造成的物体变化区分开。为了实现这样的区分，我们提出了一个新的regularization技术。我们首先说明该区分仅在这个条件下才会成立：对于要reconstruct的物体存在一个确定的canonicalization function。之后，我们同时训练这个canonicalization function。我们和那些没有用到ground truth 3D supervision的算法进行了对比，在Up3D和PASCAL3D+数据集上达到了sota的水平。
+
+**1. Introduction**
+
+对于static scene的3D reconstruction技术已经成熟，但对于那些因为articulation或者类间variations造成deformation的那些物体来说，3D reconstruction仍然存在问题。在某些情况下，这样的deformations可以通过获取同一个物体的多张连续照片来解决（比如说同一个视频的连续几帧）。然而，这样的数据是昂贵的，而且这样的算法虽然可以进行3D reconstruction，却不能对deformation进行建模。
+
+在这篇文章里，我们在只有monocular views和2D keypoint annotations的情况下来考虑如何进行3D reconstruction以及如何对deformation进行建模。一般来说，这个问题被认为是static scene reconstruction的拓展，和structure from motion (SFM) 也密切相关。但这些non-rigid sfm (nrsfm)算法一般只考虑问题的geometric层面，但3D reconstruction的效果好坏还与模型能不能对物体的deformation建模有关。
+
+我们认为modern的nrsfm算法（使用deep learning的那些）要比那些传统的nrsfm算法效果好很多。因此我们也采用一个deep networks来对3D reconstruction过程进行建模。我们这篇论文也受到之前那些如何从2D keypoints lift到3D keypoints的论文的启发，但不同的是，它们都需要3D supervision，而本文只需要2D keypoints annotations作为supervision。
+
+我们的模型，叫做C3DPO，有两个重要的创新点。首先，它通过将viewpoint和object deformation来factorize开来进行3D reconstruction。因此，C3DPO可以在canonical frame里reconstruct 3D object，而且会将由于3D rigid motion造成的appearance变化与object本身的deformation分开。
+
+然而先要实现这样的factorization是non-trivial的，这在nrsfm里已经被广泛说明了。我们的第二个创新点就是解决了这个问题。我们发现，如果两个3D reconstruction可以通过rigid motion来实现重合，那么这两个reconstruction在C3DPO下就应该是一样的，因为C3DPO是在canonical frame下进行的reconstruction。因此，对于任意的可以通过rigid motion来重合的3D shape，我们将其归为一个equivalent类，从而对于该类，存在一个canonicalization function，来将每个equivalent类里的每个shape都映射到canonical frame的shape上。我们通过learning的方法来获取这样的canonicalization function，这是通过一个neural network实现的。在训练过程中，该neural network和reconstruction的那个neural network同时训练，从而对那个network起到了regularization的作用。
+
+实验上，我们表明上述这样的创新点对于non-rigid 3D reconstruction实现了非常好以及robust的效果。我们将C3DPO的效果和其它的nrsfm方法进行了对比。我们在Human3.6M，PASCAL3D+以及Synthetic Up3D数据集上对效果进行了测试，表明C3DPO的效果比其它的那些没有用到3D supervision的效果要好。
+
+
+**3. Method**
+
+我们先介绍sfm和nrsfm的背景，之后再介绍本文的方法。
+
+**3.1 Structure from motion**
+
+sfm的输入是tuples $$y_n = (y_{n1}, \cdots, y_{nK}) \in \mathbb{R}^{2 \times K}$$，表示的是$$K$$个2D keypoints的坐标，而这样的$$y_n$$有$$N$$个，是从一个rigid object的$$N$$个views得到的。而这些views是从一个3D points $$X = (X_1, \cdots, X_K) \in \mathbb{R}^{3 \times K}$$以及$$N$$个rigid motions $$(R_n, T_n) \in SO(3) \times T(3)$$得到的，$$X$$叫做structure。这些views，structure以及motions是通过如下的公式联系起来的：$$y_nk = \Pi (R_n X_k + T_n)$$，其中$$\Pi: \mathbb{R}^3 \rightarrow \mathbb{R}^2$$是camera projection function。我们只考虑很简单的情况，也就是$$\Pi = \left[ I_2, 0 \right]$$，其中$$I_2$$是$$2 \times 2$$的单位矩阵。如果所有的keypoints都是visible的，那么可以对这些keypoints进行centering，从而省去了translation的步骤，也就是说之前的projection就是：$$y_{nk} = M_n X_k$$，其中$$M_n = \Pi R_n$$就是相机矩阵，或叫做viewpoint。从而sfm问题就变成了如下的形式：
+
+$$Y = \begin{pmatrix}
+y_{11} & \cdots & y_{1K} \
+ & \cdots & \
+y_{N1} & \cdots & y_{NK}
+\end{pmatrix}, M= \begin{pmatrix}
+M1 \
+\cdots \
+M_N
+\end{pmatrix}, Y = MX$$
+
+因此，sfm问题就变成了将一个$$2N \times K$$的矩阵$$Y$$分解为viewpoint矩阵$$M$$和structure $$X$$。但这样的factorization不是唯一的。
+
+**3.2 Non-rigid structure from motion**
+
+non-rigid sfm问题和sfm问题是类似的，除了structure $$X_n$$现在对于每个view来说都可以是不同的了（因为会发生deformation）。想要获取nrsfm的结果，需要将object的deformation限制在某种范围内。最简单的范围是利用一个线性模型来表示：$$X_n = X(\alpha_n; S)$$，将structure $$X_n$$表示为一个view-specific的pose parameter $$\alpha_n \in \mathbb{R}^D$$以及一个view-invariant的shape basis $$S \in \mathbb{R}^{3D \times K}$$的函数：
+
+$$X(\alpha_n; S) = (\alpha_n \bigotimes I_3) S$$
+
+其中$$\alpha_n$$是一个row vector，$$\bigotimes$$是Kronecker product。
+
+给定多个views的2D keypoints annotations $$y_{nk} = \Pi(R_n \sum\limits_{d=1}^{D} \alpha_{nd} S_{dk} + T_n)$$，nrsfm的目的是从这些2D keypoints annotations来获取shape basis $$S$$，view-specific coefficient $$\alpha_n$$以及view-specific structure $$X_n$$。和sfm一样，如果所有的keypoints都可见的话，那么可以将translation移除，从而上述问题变成了：
+
+$$Y = \bar{M} (\alpha \bigotimes I_3) S$$
+
+其中$$\bar{M} = diag(M_1, \cdots, M_N)$$。nrsfm问题变成了上述对于$$Y$$的factorization。和sfm一样，这样的factorization不是唯一的。
+
+**3.3 Monocular motion and structure estimation**
+
+当shape basis $$S$$被学习了之后，上述的nrsfm模型可以被用来从单个的view $$Y$$中获取viewpoint以及pose（这个时候$$Y$$的大小为$$2 \times K$$，$$\bar{M}$$大小为$$2 \times 3$$，$$\alpha$$大小为$$1 \times D$$）。然而，这仍然需要解决一个矩阵分解问题。
+
+对于C3DPO来说，我们使用一个神经网络$$\Phi$$来解决这样的一个factorization，也就是从2D keypoints $$Y$$中来获取view matrix $$M$$和pose parameters $$\alpha$$：
+
+$$\Phi: \mathbb{R}^{2K} \lbrace 0,1 \rbrace^K \rightarrow \mathbb{R}^D \times \mathbb{R}^3$$$$
+
+也就是$$\Phi: (Y,v) \rightarrow (\alpha, \theta)$$，其中$$v$$是一个只包含0和1的向量，表示每个keypoints是否是visible的，如果该keypoint不是visible的，那么该位置以及该keypoints的值都被设置为0。上述的映射$$\Phi$$的输出是$$D$$ pose parameter $$\alpha$$以及camera view matrix的系数$$\theta$$：$$M(\theta) = \Pi R(\theta)$$。
+
+使用上述这种deep network模型而不是传统的方法的一个优势是，这样的模型还能够学习到物体的structure本身带有的一些prior信息，这样的信息在之前nrsfm里说的linear model里是体现不出来的。而这个network的训练是通过将学习到的3D keypoints再reproject到2D keypoints上，计算一个reprojection loss：
+
+$$\mathcal{l_1}(Y, v, \Phi, S) = \frac{1}{K} \sum\limits_{k=1}^K v_k \cdot \lVert Y_k - M(\theta)(\alpha \bigotimes I_3)S_{:,k} \rVert_{\epsilon}$$
+
+其中$$(\alpha, \theta) = \Phi(Y,v)$$，$$\lVert z \rVert_{\epsilon} = (\sqrt{1 + (\lVert z \rVert / \epsilon)^2} - 1) \epsilon$$是pseudo-huber loss。给定一个数据集$$(Y,v)$$，就可以通过这个loss来训练$$\Phi$$了，过程由fig2的下半部分表示。
+
+![1]({{ '/assets/images/C3DPO-1.PNG' | relative_url }})
+{: style="width: 800px; max-width: 100%;"}
+*fig1. C3DPO的一个overview。上述pipeline的下半部分通过最小化reprojection error来学习monocular 3D reconstruction。上半部分通过canonicalization loss来学习如何将viewpoints和internal的deformation区分开。*
+
+**3.4 Consistent factorization via canonicalization**
+
+nrsfm的一个困难是如何将一个物体的3D shape的variations分解为viewpoint changes (rigid motions)和object deformations。在这一节里，我们提出了一个新的方法来使得reconstruction network $$\Phi$$能够做到这一点。我们所加的限制是，reconstruction network不可能能够输出两个仅仅有rigid motion区分的3D shape。
+
+
+
+
 
 ## 3. [Unsupervised Learning of Probably Symmetric Deformable 3D Objects from Images in the Wild](https://openaccess.thecvf.com/content_CVPR_2020/papers/Wu_Unsupervised_Learning_of_Probably_Symmetric_Deformable_3D_Objects_From_Images_CVPR_2020_paper.pdf)
 
