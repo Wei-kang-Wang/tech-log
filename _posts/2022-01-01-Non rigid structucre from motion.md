@@ -136,7 +136,7 @@ Monte Carlo Dropout是一种被广泛使用的度量不确定性的方法。具�
 
 **Abstract**
 
-我们提出C3DPO，一个从2D keypoint annotations里获取deformable objects的3D models的算法。我们训练了一个神经网络来一次从单张图片来reconstruct一个3D object，而且显式的将由于viewpoint变化和object deformation造成的物体变化区分开。为了实现这样的区分，我们提出了一个新的regularization技术。我们首先说明该区分仅在这个条件下才会成立：对于要reconstruct的物体存在一个确定的canonicalization function。之后，我们同时训练这个canonicalization function。我们和那些没有用到ground truth 3D supervision的算法进行了对比，在Up3D和PASCAL3D+数据集上达到了sota的水平。
+我们提出C3DPO，一个从2D keypoint annotations里获取deformable objects的3D models的算法。我们训练了一个神经网络来一次从单张图片reconstruct一个3D object，而且显式的将由于viewpoint变化和object deformation造成的物体变化区分开。为了实现这样的区分，我们提出了一个新的regularization技术。我们首先说明该区分仅在下面这个条件下才会成立：对于要reconstruct的物体存在一个确定的canonicalization function。之后，我们同时训练这个canonicalization function。我们和那些没有用到ground truth的算法进行了对比，在Up3D和PASCAL3D+数据集上达到了sota的水平。
 
 **1. Introduction**
 
@@ -151,6 +151,15 @@ Monte Carlo Dropout是一种被广泛使用的度量不确定性的方法。具�
 然而先要实现这样的factorization是non-trivial的，这在nrsfm里已经被广泛说明了。我们的第二个创新点就是解决了这个问题。我们发现，如果两个3D reconstruction可以通过rigid motion来实现重合，那么这两个reconstruction在C3DPO下就应该是一样的，因为C3DPO是在canonical frame下进行的reconstruction。因此，对于任意的可以通过rigid motion来重合的3D shape，我们将其归为一个equivalent类，从而对于该类，存在一个canonicalization function，来将每个equivalent类里的每个shape都映射到canonical frame的shape上。我们通过learning的方法来获取这样的canonicalization function，这是通过一个neural network实现的。在训练过程中，该neural network和reconstruction的那个neural network同时训练，从而对那个network起到了regularization的作用。
 
 实验上，我们表明上述这样的创新点对于non-rigid 3D reconstruction实现了非常好以及robust的效果。我们将C3DPO的效果和其它的nrsfm方法进行了对比。我们在Human3.6M，PASCAL3D+以及Synthetic Up3D数据集上对效果进行了测试，表明C3DPO的效果比其它的那些没有用到3D supervision的效果要好。
+
+
+**2. Related work**
+
+有多条lines of research研究了从deformed物体的2D keypoint annotations上获取3D shape以及viewpoint的问题。如下的related works包括了最近nrsfm里的工作。
+
+**2.1 NR-SFM**
+
+
 
 
 **3. Method**
