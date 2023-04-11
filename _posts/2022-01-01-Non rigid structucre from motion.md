@@ -357,13 +357,13 @@ $$J_{uv} = (k_s + k_d max \lbrace 0, \langle l, n_{uv} \rangle \rbrace) \dot a_{
 
 目前有两种不同的方法从non-rigid物体的2D keypoints里获取3D shapes。第一种方法是使用某种3D reconstruction算法。NrSfM算法就是从一系列2D的keypoints里reconstruct non-rigid物体的3D shapes的算法。不过NrSfM算法并没有任何3D shape priors，所以其对于每个物体的2D keypoints输入，都需要独立的去处理，从而算法时间复杂度高。第二种方法是利用3D ground truth的数据，来学习从2D到3D的mapping。最近的方法都是使用神经网络来实现2D-3D或者image-3D的mapping的学习。然而，3D ground truth数据是很难获取的，这就大大限制了这类监督方法的应用前景。
 
-我们考虑，还存在另一种可能性：也就是一个将上述两种方法结合起来的框架，也就是利用deep learning来解决NrSfM。实际上，在这个方向已经有一部分工作了：[Unsupervised 3d reconstruction networks]()，[Deep non-rigid structure from motion]()，但是这些方法所研究的都是structure-from-category（SfC）问题，也就是输入的是同一个种类的不同个体的图片，而这些个体之间的deformation实际上很小。在上述文章里的实验证明，当deformation很大的时候，他们的算法的generalization效果不是很好。最近，[C3DPO: Canonical 3d Pose Networks for non-rigid structure from motion]()提出了一个网络，利用校准3D shapes来获得3D rigid motion，从单张图片里获取3D shapes。这篇论文里的方法对于更多种类的deformation效果更好。[Distill Knowledge from nrsfm for weakly supervised 3d pose learning]()利用知识蒸馏的方式从2D keypoints里获取3D shapes信息。
+我们考虑，还存在另一种可能性：也就是一个将上述两种方法结合起来的框架，也就是利用deep learning来解决NrSfM。实际上，在这个方向已经有一部分工作了：[Unsupervised 3d reconstruction networks]()，[Deep non-rigid structure from motion]()，但是这些方法所研究的都是structure-from-category（SfC）问题，也就是输入的是同一个种类的不同个体的图片，而这些个体之间的deformation实际上很小。上述文章的实验证明，当deformation很大的时候，他们的算法的generalization效果不是很好。最近，[C3DPO: Canonical 3d Pose Networks for non-rigid structure from motion]()提出了一个网络，利用校准3D shapes来获得3D rigid motion，从单张图片里获取3D shapes。这篇论文里的方法对于更多种类的deformation效果更好。[Distill Knowledge from nrsfm for weakly supervised 3d pose learning]()利用知识蒸馏的方式从2D keypoints里获取3D shapes信息。
 
 NrSfM的主要困难在于模型需要同时预测rigid motion和non-rigid deformation，而这个困难在过去的20年里被深入的讨论和研究过。更难的是，motion和deformation有时候会被混淆，变得难以区分。之前有工作利用generalized procrustes analysis来解决这个问题。然而，最近的这些deep NrSfM都是同时来预测motion和deformation的。在这些方法里，只有[C3DPO: Canonical 3d Pose Networks for non-rigid structure from motion]()考虑了motion和deformation的分离问题。
 
 在这篇文章里，我们提出了一个新的方法来解决NrSfM问题：首先，我们证明一系列经过procrustes aligned后的shapes是transversal的。从而，我们就不需要显式的估计rigid motions，而是通过一个loss来约束。从而，我们就可以使得网络专注于预测3D shapes了，从而我们只需要比较简单的网络结构。我们所提出的框架，procrustean regression network (PRN)，就可以只从2D keypoints输入里获取3D structure了。
 
-fig 1说明了所提出的框架的流程。PRN以一系列图片或者2D keypoints作为输入。PRN训练所用的objective function是由reprojection error和aligned shapes之间的距离所组成的。整个训练过程是端到端的，而在inference的时候，只需要输入一张图片或者2D keypoints的sequence，就可以直接生成3D structure。大量的实验证明了我们所提出的方法的可信性。
+fig 1说明了所提出的框架的流程。PRN以一系列图片或者2D keypoints作为输入。PRN训练所用的objective function是由reprojection error和aligned shapes之间的距离所组成的。整个训练过程是端到端的，而在inference的时候，只需要输入一张图片或者2D keypoints的sequence，就可以直接生成3D structure。大量的实验证明了我们所提出的方法的可行性。
 
 
 **3. Method**
@@ -395,7 +395,7 @@ $$R_i = \mathop{\arg\min}\limits_{R} \lVert RX_iT - \bar{X} \rVert$$
 
 **3.2 PR loss for neural networks**
 
-我们可以直接构建一个神经网络来预测公式1里的3D shape $$X_i$$和reference shape $$\bar{X}$$。然而，reference shapes在这种情况下可能会有一些问题。如果我们所处理的物体类别并不会有大的deformations，那么将reference shape作为一个global parameter是可行的。但如果它有较大的deformations（比如说human body），那训练的时候每个minibatch里的shapes不能够有较大的deformations就显得很重要（也就是每个minibatch里的shapes要相似）。在这种情况下，一个独立的来预测一个好的3D reference shape的模块就显得很重要。然而，多出来这样的一个模块会使得训练变得更加困难。为了让网络变得简单，我们不再将公式1里的$$\bar{X}$$当作一个需要被学习的输出，而是利用aligned 3D shapes的mean来表示它。从而$$\bar{X} = \sum\limits_{j=1}^{n_f} R_j X_j T$$。现在，$$X_i$$成了公式1里唯一需要被学习的输出，而objective $$J$$对于$$X_i$$的导数，$$\frac{\partial J}{\partial X_i}$$可以被理论计算出来。
+我们可以直接构建一个神经网络来预测公式1里的3D shape $$X_i$$和reference shape $$\bar{X}$$。然而，reference shapes在这种情况下可能会有一些问题。如果我们所处理的物体类别并不会有大的deformations，那么将reference shape作为一个global parameter是可行的。但如果它有较大的deformations（比如说human body），那训练的时候每个minibatch里的shapes不能够有较大的deformations就显得很重要（也就是每个minibatch里的shapes要相似）。在这种情况下，一个独立的来预测一个好的3D reference shape的模块就显得很重要。而且，多出来这样的一个模块会使得训练变得更加困难。为了让网络变得简单，我们不再将公式1里的$$\bar{X}$$当作一个需要被学习的输出，而是利用aligned 3D shapes的mean来表示它。从而$$\bar{X} = \sum\limits_{j=1}^{n_f} R_j X_j T$$。现在，$$X_i$$成了公式1里唯一需要被学习的输出，而objective $$J$$对于$$X_i$$的导数，$$\frac{\partial J}{\partial X_i}$$可以被理论计算出来。
 
 从而PRN的objective就可以重写为：
 
@@ -409,12 +409,14 @@ $$R = \mathop{\arg\min}\limits_{R} \sum\limits_{i=1}^{n_f} \lVert R_i X_i T - \f
 
 $$\frac{\partial \mathcal{J}}{\partial X} = \frac{\partial f}{\partial X} + \lambda \langle \frac{\partial g}{\partial \tilde{X}}, \frac{\partial \tilde{X}}{\partial X} \rangle$$
 
-其中$$\frac{\partial \tilde{X}}{\partial X}$$是可以被计算出来的（仅和$$X_i$$有关）。
+其中$$\frac{\partial \tilde{X}}{\partial X}$$是可以被计算出来的（仅和$$X_i$$有关），很复杂，可以参考补充材料。而且当$$f$$和$$g$$确定之后，$$\frac{\partial f}{\partial X}$$和$$\frac{\partial g}{\partial \tilde X}$$也就可以被计算出来了。
+
+虽然对于$$\frac{\partial \tilde{X}}{\partial X}$$的推导过程很复杂，但实际上和我们的网络设计也没有关系，我们只需要数学上证明这个确实是可以计算出来的，具体的计算就交给反向传播了（也就是说验证其是differentiable的）。
 
 
 **3.3 $$f$$和$$g$$的设计**
 
-对于训练网络的objective里的data term $$f$$，我们使用所预测的3D shapes和ground truth的2D keypoints之间的reprojection error来衡量。在这篇文章里，我们考虑的是orthographic projection，考虑perspective projection也是一样的。$$f$$的具体计算方式如下：
+在PRN里，网络输出的是一个3D keypoint matrix（3D shape）。对于训练网络的objective里的data term $$f$$，我们使用所预测的3D shapes和ground truth的2D keypoints之间的reprojection error来衡量。在这篇文章里，我们考虑的是orthographic projection，考虑perspective projection也是一样的。$$f$$的具体计算方式如下：
 
 $$f(X) = \sum\limits_{i=1}^{n_f} \frac{1}{2} \lVert (U_i - P_o X_i ) \odot W_i \rVert_F^2$$
 
@@ -425,6 +427,10 @@ $$f(X) = \sum\limits_{i=1}^{n_f} \frac{1}{2} \lVert (U_i - P_o X_i ) \odot W_i \
 是一个大小为$$2 \times 3$$ orthographic projection matrix，$$U_i$$是一个$$2 \times n_p$$的矩阵，表示2D keypoints ground truth。$$W_i$$是一个$$2 \times n_p$$的weight矩阵，第$$i$$列表示对于第$$i$$个keypoint的confidence，$$W_i$$里的值范围在0到1，0表示这个keypoints因为occlusion而看不到。2D keypoint detectors的scores可以被用来生成$$W_i$$。上述公式里的$$\odot$$表示element-wise multiplication。
 
 对于regularization term，也就是$$g$$，我们对于aligned的shapes加上一个low-rank约束。常用的两种方法是log-determinant和nuclear norm（矩阵奇异值的和）。
+
+**3.4 Network Structure**
+
+这篇文章使用了两种网络结构，fully connected networks（FCN）和CNN。对于FCN结构，x,y的预测和z的预测用了不同的网络来分别得出，实验证明效果更好，如fig2所示。FCN的数据就仅仅只是2D keypoints的gt构成的sequence。对于CNN结构，输入网络的是RGB图片，使用resnet50作为backbone。最后一层卷积层大小为$$2048 \times 7 \times 7$$，再利用fully connected layer将其转换为3D keypoints矩阵输出。resnet的参数被设定为在imagenet上预训练过了的。
 
 
 
