@@ -136,19 +136,19 @@ Monte Carlo Dropout是一种被广泛使用的度量不确定性的方法。具�
 
 **Abstract**
 
-我们提出C3DPO，一个从2D keypoint annotations里获取deformable objects的3D models的算法。我们训练了一个神经网络来一次从单张图片reconstruct一个3D object，而且显式的将由于viewpoint变化和object deformation造成的物体变化区分开。为了实现这样的区分，我们提出了一个新的regularization技术。我们首先说明该区分仅在下面这个条件下才会成立：对于要reconstruct的物体存在一个确定的canonicalization function。之后，我们同时训练这个canonicalization function。我们和那些没有用到ground truth的算法进行了对比，在Up3D和PASCAL3D+数据集上达到了sota的水平。
+我们提出了C3DPO，一个从2D keypoint annotations里获取deformable objects的3D models的算法。我们训练了一个神经网络来一次从单张图片reconstruct一个3D object，而且显式的将由于viewpoint变化和object deformation造成的物体变化区分开。为了实现这样的区分，我们提出了一个新的regularization技术。我们首先说明该区分仅在下面这个条件下才会成立：对于要reconstruct的物体存在一个确定的canonicalization function。之后，我们同时训练这个canonicalization function。我们和那些没有用到ground truth的算法进行了对比，在Up3D和PASCAL3D+数据集上达到了sota的水平。
 
 **1. Introduction**
 
-对于static scene的3D reconstruction技术已经成熟，但对于那些因为articulation或者类间variations造成deformation的那些物体来说，3D reconstruction仍然存在问题。在某些情况下，这样的deformations可以通过获取同一个物体的多张连续照片来解决（比如说同一个视频的连续几帧）。然而，这样的数据是昂贵的，而且这样的算法虽然可以进行3D reconstruction，却不能对deformation进行建模。
+对于static scene的3D reconstruction技术已经成熟，但对于那些因为articulation或者类内variations造成deformation的那些物体来说，3D reconstruction仍然存在问题。在某些情况下，这样的deformations可以通过获取同一个物体的的照片来解决（multi views）。这样的数据需要有多个角度的传感器，而且也仅仅是能够对物体进行3D reconstruction，也并没有对deformation进行显式建模。
 
 在这篇文章里，我们在只有monocular views和2D keypoint annotations的情况下来考虑如何进行3D reconstruction以及如何对deformation进行建模。一般来说，这个问题被认为是static scene reconstruction的拓展，和structure from motion (SFM) 也密切相关。但这些non-rigid sfm (nrsfm)算法一般只考虑问题的geometric层面，但3D reconstruction的效果好坏还与模型能不能对物体的deformation建模有关。
 
 我们认为modern的nrsfm算法（使用deep learning的那些）要比那些传统的nrsfm算法效果好很多。因此我们也采用一个deep networks来对3D reconstruction过程进行建模。我们这篇论文也受到之前那些如何从2D keypoints lift到3D keypoints的论文的启发，但不同的是，它们都需要3D supervision，而本文只需要2D keypoints annotations作为supervision。
 
-我们的模型，叫做C3DPO，有两个重要的创新点。首先，它通过将viewpoint和object deformation来factorize开来进行3D reconstruction。因此，C3DPO可以在canonical frame里reconstruct 3D object，而且会将由于3D rigid motion造成的appearance变化与object本身的deformation分开。
+我们的模型，叫做C3DPO，有两个重要的创新点。首先，它通过将viewpoint变化和object deformation所造成的appearance变化区分开来进行3D reconstruction。因此，C3DPO可以在canonical frame里reconstruct 3D object，其会先获得物体相对于canonical position的3d rigid motion，剩下的就是这个物体种类本身内部的deformations了。
 
-然而先要实现这样的factorization是non-trivial的，这在nrsfm里已经被广泛说明了。我们的第二个创新点就是解决了这个问题。我们发现，如果两个3D reconstruction可以通过rigid motion来实现重合，那么这两个reconstruction在C3DPO下就应该是一样的，因为C3DPO是在canonical frame下进行的reconstruction。因此，对于任意的可以通过rigid motion来重合的3D shape，我们将其归为一个equivalent类，从而对于该类，存在一个canonicalization function，来将每个equivalent类里的每个shape都映射到canonical frame的shape上。我们通过learning的方法来获取这样的canonicalization function，这是通过一个neural network实现的。在训练过程中，该neural network和reconstruction的那个neural network同时训练，从而对那个network起到了regularization的作用。
+然而先要实现这样的factorization是non-trivial的，这在之前的那些nrsfm工作里已经被广泛说明了。我们的第二个创新点就是解决了这个问题。我们发现，如果两个3D reconstruction可以通过rigid motion来实现重合，那么这两个reconstruction在C3DPO下就应该是一样的，因为C3DPO是在canonical frame下进行的reconstruction。因此，对于任意的可以通过rigid motion来重合的3D shape，我们将其归为一个equivalent类，从而对于该类，存在一个canonicalization function，来将这个equivalent类里的每个shape都映射到canonical shape上。我们通过learning的方法来获取这样的canonicalization function，这是通过一个neural network实现的。在训练过程中，该neural network和reconstruction的那个neural network同时训练，从而对那个network起到了regularization的作用。
 
 实验上，我们表明上述这样的创新点对于non-rigid 3D reconstruction实现了非常好以及robust的效果。我们将C3DPO的效果和其它的nrsfm方法进行了对比。我们在Human3.6M，PASCAL3D+以及Synthetic Up3D数据集上对效果进行了测试，表明C3DPO的效果比其它的那些没有用到3D supervision的效果要好。
 
@@ -218,7 +218,27 @@ $$\mathcal{l_1}(Y, v, \Phi, S) = \frac{1}{K} \sum\limits_{k=1}^K v_k \cdot \lVer
 
 **3.4 Consistent factorization via canonicalization**
 
-nrsfm的一个困难是如何将一个物体的3D shape的variations分解为viewpoint changes (rigid motions)和object deformations。在这一节里，我们提出了一个新的方法来使得reconstruction network $$\Phi$$能够做到这一点。我们所加的限制是，reconstruction network不可能能够输出两个仅仅有rigid motion区分的3D shape。
+nrsfm的一个困难是如何将一个物体的3D shape的variations分解为viewpoint changes (rigid motions)和object deformations。在这一节里，我们提出了一个新的方法来使得reconstruction network $$\Phi$$能够做到这一点。我们所加的限制是，reconstruction network不可能能够输出两个仅仅有rigid motion区分的3D shape，因为这样的3D shape通过viewpoint变化就可以重合。
+
+具体来说，$$\mathcal{X_0}$$表示网络能够输出的所有的reconstructions的集合（也就是所有的3D shapes的集合），记为$$X(\alpha;S)$$，其中$$\alpha$$是每个shape的coefficient，$$\theta$$表示相机角度，他们是通过$$(\alpha, \theta)=\Phi(Y,v)$$获得的，其中$$Y$$是输入的2D shape，$$v$$是2D shape里每个点是否可见的signal变量。如果这个网络能够满足之前所说的性质，那么对于$$X,X^{'} \in \mathcal{X_0}$$，就不存在一个rotation $$R$$使得$$X^{'} = RX$$。严格定义的话就是如下：
+
+**Definition1** 集合$$\mathcal{X_0}$$如果对于任意两个元素$$X,X^{'} \in \mathcal{X_0}$$，都不存在一个rotation $$R$$使得$$X^{'} = RX$$，那么就称这个集合$$\mathcal{X_0}$$具有transversal property。
+
+上述的transversal property也可以被理解为：那些rotation矩阵将3D shape的空间$$\mathbb{R}^{3 \times K}$$分为了一个个equivalent class。而我们希望网络对于每一类equivalent class都只给出唯一一个输出。
+
+具体落实到模型的设计，我们是通过要求模型满足如下的要求来实现其具有transversal property的。
+
+**Lemma1** 如果存在一个canonicalization function $$\Psi: \mathbb{R}^{3 \times K} \rightarrow \mathbb{R}^{3 \times K}$$满足对于任意的rotation $$R \in SO(3)$$以及任意的3D shape $$X \in \mathcal{X_0}$$，都有$$X = \Psi(RX)$$，那么这个集合$$\mathcal{X_0}$$具有transversal property。
+
+也就是说，如果这个集合具有transversal property，那么这个canonicalization function可以将这个集合里的任意一个3D shape的任意的旋转都再映射回这个3D shape。
+
+对于C3DPO来说，这个lemma具体落实为下面的loss，用来约束viewpoint和pose的一个consistent的decomposition：
+
+$$\mathcal{l_2}(X,R,\Psi) = \frac{1}{K} \sum_{k=1}^K \lVert X_{:,k} - \Psi(RX) \rVert_{\epsilon}$$
+
+其中$$R \in SO(3)$$是一个随机的rotation，$$\Psi$$是一个神经网络，其和主网络$$\Phi$$一起训练。具体来说，对于一组输入2D keypoint，$$Y_n$$，首先通过$$\Phi(Y_n, v)$$来获取viewpoint和pose parameters $$\theta_n$$和$$\alpha_n$$，其就可以用来计算re-projection loss $$\mathcal{l_1$$了。同时，随机采样一个rotation $$\hat{R}$$，将其应用在$$\Phi$$得到的3D shape上，也就是$$X_n = X(\alpha_n; S)$$上，将$$\hat{R}X_n$$通过canonilisation function $$\Psi$$，$$\Psi$$会消除$$\hat{R}$$的影响，重新输出一个shape coefficient $$\hat{\alpha_n}$$，从而有$$\hat{X_n} = X(\hat{\alpha_n};S)$$，其应该和$$X_n$$一样，这是通过$$\mathcal{l_2}$$实现的。这两个loss联合训练从而同时训练$$\Phi$$和$$\Psi$$。fig2是流程图，fig3显示了缺失某个loss的影响。
+
+
 
 
 
