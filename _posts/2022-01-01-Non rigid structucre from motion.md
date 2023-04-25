@@ -182,7 +182,7 @@ Monte Carlo Dropout是一种被广泛使用的度量不确定性的方法。具�
 
 **技术细节**
 
-* 对于任意一个3D shape $$X_i \in \mathbb{R}^{3 \times n_p}$$，和reference shape，$$\bar{X}$$，aligned所使用的rotation matrix是这样计算得来的：$$R_i = \mathop{argmin}\limites_{R} \lVert RX_iT - \bar{X} \rVert$$，其中$$R_i^T R = I$$，$$T = I_{n_p} - \frac{1}{n_p} 1_{n_p} 1_{n_p}^T$$是translation matrix，用于将shape $$X_i$$center到origin上。这里的$$T$$的用法可以被借鉴。而aligned的shape就是$$\tilde{X_i} = R_i X_i T$$。
+* 对于任意一个3D shape $$X_i \in \mathbb{R}^{3 \times n_p}$$，和reference shape，$$\bar{X}$$，aligned所使用的rotation matrix是这样计算得来的：$$R_i = \mathop{argmin}\limits_{R} \lVert RX_iT - \bar{X} \rVert$$，其中$$R_i^T R = I$$，$$T = I_{n_p} - \frac{1}{n_p} 1_{n_p} 1_{n_p}^T$$是translation matrix，用于将shape $$X_i$$center到origin上。这里的$$T$$的用法可以被借鉴。而aligned的shape就是$$\tilde{X_i} = R_i X_i T$$。
 * PRN和PR这两篇文章都花了大量的篇幅证明上述网络设计的每个部分都是differentiable的（计算出来了loss对于$$X_i$$和reference shape $$\bar{X}$$的导数），所以说GPA也可以被放在可学习的框架内。
 * PRN相对于C3DPO还有个创新就是，其的输入既可以是和C3DPO一样，是2D keypoint matrix，也可以是RGB图片，分别使用MLP和CNN来作为网络框架。
 
