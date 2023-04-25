@@ -170,7 +170,21 @@ Monte Carlo Dropout是一种被广泛使用的度量不确定性的方法。具�
 
 [[CODE](https://github.com/sungheonpark/PRN)]
 
+**line of research**
 
+[C3DPO](https://openaccess.thecvf.com/content_ICCV_2019/papers/Novotny_C3DPO_Canonical_3D_Pose_Networks_for_Non-Rigid_Structure_From_Motion_ICCV_2019_paper.pdf) $$\longrightarrow$$ [PRN](https://arxiv.org/pdf/2007.10961.pdf)
+
+[EM-PND](https://openaccess.thecvf.com/content_cvpr_2013/papers/Lee_Procrustean_Normal_Distribution_2013_CVPR_paper.pdf) $$\longrightarrow$$ [PR](https://ieeexplore.ieee.org/document/8052164) $$\longrightarrow$$ [PRN](https://arxiv.org/pdf/2007.10961.pdf)
+
+其中，PRN是基于C3DPO的想法，也想要将rigid motion和object本身形变造成的2D keypoints不同给分离开，C3DPO专门设计了一个新的网络$$\Psi$$来解决这个，而PRN则是通过将每个shape都用Generalized procrustes analysis align到一起叠成一个matrix，然后对这个matrix进行约束实现的（比如说进行nuclear norm约束其rank等）。而PRN的这个使用GPA进行align的想法则是源于PR这篇论文，而PR的想法则是源于EM-PND。EM-PND是希望使用procrustean distribution来表示这些aligned的shapes，而使用EM算法来对参数进行学习。
+
+所以说，PRN的核心就是使用某种在aligned shapes上的regularization term来替代C3DPO里的canonicalization网络，而这些aligned shapes则是通过GPA计算得来。在PRN里，procrustean analysis的reference shape是aligned的shape的平均值，而在PR里这也是个可学习的参数。
+
+**技术细节**
+
+* 对于任意一个3D shape $$X_i \in \mathbb{R}^{3 \times n_p}$$，和reference shape，$$\bar{X}$$，aligned所使用的rotation matrix是这样计算得来的：$$R_i = \mathop{argmin}\limites_{R} \lVert RX_iT - \bar{X} \rVert$$，其中$$R_i^T R = I$$，$$T = I_{n_p} - \frac{1}{n_p} 1_{n_p} 1_{n_p}^T$$是translation matrix，用于将shape $$X_i$$center到origin上。这里的$$T$$的用法可以被借鉴。而aligned的shape就是$$\tilde{X_i} = R_i X_i T$$。
+* PRN和PR这两篇文章都花了大量的篇幅证明上述网络设计的每个部分都是differentiable的（计算出来了loss对于$$X_i$$和reference shape $$\bar{X}$$的导数），所以说GPA也可以被放在可学习的框架内。
+* PRN相对于C3DPO还有个创新就是，其的输入既可以是和C3DPO一样，是2D keypoint matrix，也可以是RGB图片，分别使用MLP和CNN来作为网络框架。
 
 
 
