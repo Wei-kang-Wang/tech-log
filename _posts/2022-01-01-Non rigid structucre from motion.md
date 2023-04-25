@@ -134,109 +134,44 @@ Monte Carlo Dropout是一种被广泛使用的度量不确定性的方法。具�
 [[CODE](https://github.com/facebookresearch/c3dpo_nrsfm)]
 [[PAGE](https://research.facebook.com/publications/c3dpo-canonical-3d-pose-networks-for-non-rigid-structure-from-motion/)]
 
-**Abstract**
+这篇文章解决的问题是NrSfM，输入是同一个物体的不同角度的views的2D keypoints annotations，也就是一个$$2 \times K$$的矩阵，$$K$$是超参数，keypoints的数量，输出是该物体的3D keypoints，也就是3D shape，大小为$$3 \times K$$。输入并不是RGB图片。
 
-我们提出了C3DPO，一个从2D keypoint annotations里获取deformable objects的3D models的算法。我们训练了一个神经网络来一次从单张图片reconstruct一个3D object，而且显式的将由于viewpoint变化和object deformation造成的物体变化区分开。为了实现这样的区分，我们提出了一个新的regularization技术。我们首先说明该区分仅在下面这个条件下才会成立：对于要reconstruct的物体存在一个确定的canonicalization function。之后，我们同时训练这个canonicalization function。我们和那些没有用到ground truth的算法进行了对比，在Up3D和PASCAL3D+数据集上达到了sota的水平。
+这篇文章的亮点在于，作为2019年的文章，还处于使用deep learning解决NrSfM问题的中期，在现在来看方法并不复杂，但好的效果和好的可视化整体来看是不错的。文章的主要想法是要将由物体的rigid motion transformation导致的2D keypoints不同，与物体形变（比如人体视频不同帧因为动作变化导致的物体形变）导致的不同区分开。文章是通过引入两个loss来解决这个问题。
 
-**1. Introduction**
+第一个loss很显然，网络在以2D keypoints matrix作为输出后，并不是直接输出3D keypoint matrix，而是输出一个basis $$S \in \mathbb{R}^{3D \times K}$$，一个依赖于输入的coefficient vector $$\alpha \in \mathbb{R}^{1 \times D}$$，然后将3D matrix用这个basis的线性组合来表示：$$X = (\alpha \bigotimes I_3)S$$，其中$$\bigotimes$$是Kronecker product，而$$D$$是超参数。再然后，将这个3D matrix $$X$$ 经过rotation $$R$$之后再project到2D上，和输入的2D ground truth进行比较，计算loss。
 
-对于static scene的3D reconstruction技术已经成熟，但对于那些因为articulation或者类内variations造成deformation的那些物体来说，3D reconstruction仍然存在问题。在某些情况下，这样的deformations可以通过获取同一个物体的的照片来解决（multi views）。这样的数据需要有多个角度的传感器，而且也仅仅是能够对物体进行3D reconstruction，也并没有对deformation进行显式建模。
+上述有几个技术性细节：
+* rotation matrix $$R$$和coefficient $$\alpha$$均为网络的输出，basis $$S$$是网络参数
+* 在预处理数据的时候就将2D keypoint的x和y维度分别进行了zero-center处理，并且整体乘上了一个scalar，使得variance较大的那个轴（x或y）的数值范围大概位于-1到1之间。这样的话，就可以在计算transformation的时候不用考虑translation了。
+* 在计算loss的时候，计算的是两个matrix或者vector之间的loss，用的不是一般的loss，而是humber loss，暂时还不知道为什么要这样。
+* 输入不仅仅有$$Y$$，实际上还有每个keypoint是否visible的flag vector $$v$$，在计算loss的时候，这些$$v$$就乘以每个keypoints，也就是说，不可见的就不算在内。
 
-在这篇文章里，我们在只有monocular views和2D keypoint annotations的情况下来考虑如何进行3D reconstruction以及如何对deformation进行建模。一般来说，这个问题被认为是static scene reconstruction的拓展，和structure from motion (SFM) 也密切相关。但这些non-rigid sfm (nrsfm)算法一般只考虑问题的geometric层面，但3D reconstruction的效果好坏还与模型能不能对物体的deformation建模有关。
+第二个loss是作者为了使得网络认为所有的只经过rigid body transformation后的shape都应该等价所加上的。具体做法是，再设计一个网络$$\Psi$$，前一个网络叫做$$\Phi$$，对于任何一个2D keypoint matrix $$Y$$输入，$$\Phi$$输出了$$\alpha$$和$$R$$，以及$$S$$，从而计算出了3D matrix $$X$$。对于网络$$\Psi$$，先随机采样一个rotation matrix $$R^{'}$$，然后将$$R^{'}X$$输入$$\Psi$$，输出$$\alpha^{'}$$（注意，并不是直接输出3D shape）。然后，结合$$S$$，得到了一个新的3D shape $$X^{'} = (\alpha^{'} \bigotimes I_3) S$$，新的loss就是$$X^{'}$$和$$X$$之间的距离。
 
-我们认为modern的nrsfm算法（使用deep learning的那些）要比那些传统的nrsfm算法效果好很多。因此我们也采用一个deep networks来对3D reconstruction过程进行建模。我们这篇论文也受到之前那些如何从2D keypoints lift到3D keypoints的论文的启发，但不同的是，它们都需要3D supervision，而本文只需要2D keypoints annotations作为supervision。
+最后还有个可有可无的loss，也就是还可以在plane内加上rotation，也就是说不是对于$$X$$加上3D rotation matrix，而是直接对于$$Y$$加上2D rotation matrix，这是用来使得网络$$\Phi$$更robust的，可以理解为一种data augmentation。
 
-我们的模型，叫做C3DPO，有两个重要的创新点。首先，它通过将viewpoint变化和object deformation所造成的appearance变化区分开来进行3D reconstruction。因此，C3DPO可以在canonical frame里reconstruct 3D object，其会先获得物体相对于canonical position的3d rigid motion，剩下的就是这个物体种类本身内部的deformations了。
+流程图如下：
 
-然而先要实现这样的factorization是non-trivial的，这在之前的那些nrsfm工作里已经被广泛说明了。我们的第二个创新点就是解决了这个问题。我们发现，如果两个3D reconstruction可以通过rigid motion来实现重合，那么这两个reconstruction在C3DPO下就应该是一样的，因为C3DPO是在canonical frame下进行的reconstruction。因此，对于任意的可以通过rigid motion来重合的3D shape，我们将其归为一个equivalent类，从而对于该类，存在一个canonicalization function，来将这个equivalent类里的每个shape都映射到canonical shape上。我们通过learning的方法来获取这样的canonicalization function，这是通过一个neural network实现的。在训练过程中，该neural network和reconstruction的那个neural network同时训练，从而对那个network起到了regularization的作用。
-
-实验上，我们表明上述这样的创新点对于non-rigid 3D reconstruction实现了非常好以及robust的效果。我们将C3DPO的效果和其它的nrsfm方法进行了对比。我们在Human3.6M，PASCAL3D+以及Synthetic Up3D数据集上对效果进行了测试，表明C3DPO的效果比其它的那些没有用到3D supervision的效果要好。
-
-
-**2. Related work**
-
-有多条lines of research研究了从deformed物体的2D keypoint annotations上获取3D shape以及viewpoint的问题。如下的related works包括了最近nrsfm里的工作。
-
-**2.1 NR-SFM**
-
-
-
-
-**3. Method**
-
-我们先介绍sfm和nrsfm的背景，之后再介绍本文的方法。
-
-**3.1 Structure from motion**
-
-sfm的输入是tuples $$y_n = (y_{n1}, \cdots, y_{nK}) \in \mathbb{R}^{2 \times K}$$，表示的是$$K$$个2D keypoints的坐标，而这样的$$y_n$$有$$N$$个，是从一个rigid object的$$N$$个views得到的。而这些views是从一个3D points $$X = (X_1, \cdots, X_K) \in \mathbb{R}^{3 \times K}$$以及$$N$$个rigid motions $$(R_n, T_n) \in SO(3) \times T(3)$$得到的，$$X$$叫做structure。这些views，structure以及motions是通过如下的公式联系起来的：$$y_nk = \Pi (R_n X_k + T_n)$$，其中$$\Pi: \mathbb{R}^3 \rightarrow \mathbb{R}^2$$是camera projection function。我们只考虑很简单的情况，也就是$$\Pi = \left[ I_2, 0 \right]$$，其中$$I_2$$是$$2 \times 2$$的单位矩阵。如果所有的keypoints都是visible的，那么可以对这些keypoints进行centering，从而省去了translation的步骤，也就是说之前的projection就是：$$y_{nk} = M_n X_k$$，其中$$M_n = \Pi R_n$$就是相机矩阵，或叫做viewpoint。从而sfm问题就变成了如下的形式：
-
-$$Y = \begin{pmatrix}
-y_{11} & \cdots & y_{1K} \
- & \cdots & \
-y_{N1} & \cdots & y_{NK}
-\end{pmatrix}, M= \begin{pmatrix}
-M1 \
-\cdots \
-M_N
-\end{pmatrix}, Y = MX$$
-
-因此，sfm问题就变成了将一个$$2N \times K$$的矩阵$$Y$$分解为viewpoint矩阵$$M$$和structure $$X$$。但这样的factorization不是唯一的。
-
-**3.2 Non-rigid structure from motion**
-
-non-rigid sfm问题和sfm问题是类似的，除了structure $$X_n$$现在对于每个view来说都可以是不同的了（因为会发生deformation）。想要获取nrsfm的结果，需要将object的deformation限制在某种范围内。最简单的范围是利用一个线性模型来表示：$$X_n = X(\alpha_n; S)$$，将structure $$X_n$$表示为一个view-specific的pose parameter $$\alpha_n \in \mathbb{R}^D$$以及一个view-invariant的shape basis $$S \in \mathbb{R}^{3D \times K}$$的函数：
-
-$$X(\alpha_n; S) = (\alpha_n \bigotimes I_3) S$$
-
-其中$$\alpha_n$$是一个row vector，$$\bigotimes$$是Kronecker product。
-
-给定多个views的2D keypoints annotations $$y_{nk} = \Pi(R_n \sum\limits_{d=1}^{D} \alpha_{nd} S_{dk} + T_n)$$，nrsfm的目的是从这些2D keypoints annotations来获取shape basis $$S$$，view-specific coefficient $$\alpha_n$$以及view-specific structure $$X_n$$。和sfm一样，如果所有的keypoints都可见的话，那么可以将translation移除，从而上述问题变成了：
-
-$$Y = \bar{M} (\alpha \bigotimes I_3) S$$
-
-其中$$\bar{M} = diag(M_1, \cdots, M_N)$$。nrsfm问题变成了上述对于$$Y$$的factorization。和sfm一样，这样的factorization不是唯一的。
-
-**3.3 Monocular motion and structure estimation**
-
-当shape basis $$S$$被学习了之后，上述的nrsfm模型可以被用来从单个的view $$Y$$中获取viewpoint以及pose（这个时候$$Y$$的大小为$$2 \times K$$，$$\bar{M}$$大小为$$2 \times 3$$，$$\alpha$$大小为$$1 \times D$$）。然而，这仍然需要解决一个矩阵分解问题。
-
-对于C3DPO来说，我们使用一个神经网络$$\Phi$$来解决这样的一个factorization，也就是从2D keypoints $$Y$$中来获取view matrix $$M$$和pose parameters $$\alpha$$：
-
-$$\Phi: \mathbb{R}^{2K} \lbrace 0,1 \rbrace^K \rightarrow \mathbb{R}^D \times \mathbb{R}^3$$$$
-
-也就是$$\Phi: (Y,v) \rightarrow (\alpha, \theta)$$，其中$$v$$是一个只包含0和1的向量，表示每个keypoints是否是visible的，如果该keypoint不是visible的，那么该位置以及该keypoints的值都被设置为0。上述的映射$$\Phi$$的输出是$$D$$ pose parameter $$\alpha$$以及camera view matrix的系数$$\theta$$：$$M(\theta) = \Pi R(\theta)$$。
-
-使用上述这种deep network模型而不是传统的方法的一个优势是，这样的模型还能够学习到物体的structure本身带有的一些prior信息，这样的信息在之前nrsfm里说的linear model里是体现不出来的。而这个network的训练是通过将学习到的3D keypoints再reproject到2D keypoints上，计算一个reprojection loss：
-
-$$\mathcal{l_1}(Y, v, \Phi, S) = \frac{1}{K} \sum\limits_{k=1}^K v_k \cdot \lVert Y_k - M(\theta)(\alpha \bigotimes I_3)S_{:,k} \rVert_{\epsilon}$$
-
-其中$$(\alpha, \theta) = \Phi(Y,v)$$，$$\lVert z \rVert_{\epsilon} = (\sqrt{1 + (\lVert z \rVert / \epsilon)^2} - 1) \epsilon$$是pseudo-huber loss。给定一个数据集$$(Y,v)$$，就可以通过这个loss来训练$$\Phi$$了，过程由fig2的下半部分表示。
-
-![1]({{ '/assets/images/C3DPO-1.PNG' | relative_url }})
+![C3DPO-1]({{ '/assets/images/C3DPO-1.PNG' | relative_url }})
 {: style="width: 800px; max-width: 100%;"}
-*fig1. C3DPO的一个overview。上述pipeline的下半部分通过最小化reprojection error来学习monocular 3D reconstruction。上半部分通过canonicalization loss来学习如何将viewpoints和internal的deformation区分开。*
 
-**3.4 Consistent factorization via canonicalization**
 
-nrsfm的一个困难是如何将一个物体的3D shape的variations分解为viewpoint changes (rigid motions)和object deformations。在这一节里，我们提出了一个新的方法来使得reconstruction network $$\Phi$$能够做到这一点。我们所加的限制是，reconstruction network不可能能够输出两个仅仅有rigid motion区分的3D shape，因为这样的3D shape通过viewpoint变化就可以重合。
+**技术细节**
 
-具体来说，$$\mathcal{X_0}$$表示网络能够输出的所有的reconstructions的集合（也就是所有的3D shapes的集合），记为$$X(\alpha;S)$$，其中$$\alpha$$是每个shape的coefficient，$$\theta$$表示相机角度，他们是通过$$(\alpha, \theta)=\Phi(Y,v)$$获得的，其中$$Y$$是输入的2D shape，$$v$$是2D shape里每个点是否可见的signal变量。如果这个网络能够满足之前所说的性质，那么对于$$X,X^{'} \in \mathcal{X_0}$$，就不存在一个rotation $$R$$使得$$X^{'} = RX$$。严格定义的话就是如下：
+* 网络并不是直接输出的rotation matrix，而是输出了一个长度为3的向量，然后经过hat operator和matrix exponential计算，得到了rotation matrix
+* hat operator: https://en.wikipedia.org/wiki/Hat_operator
+* matrix exponential: https://en.wikipedia.org/wiki/Matrix_exponential
 
-**Definition1** 集合$$\mathcal{X_0}$$如果对于任意两个元素$$X,X^{'} \in \mathcal{X_0}$$，都不存在一个rotation $$R$$使得$$X^{'} = RX$$，那么就称这个集合$$\mathcal{X_0}$$具有transversal property。
 
-上述的transversal property也可以被理解为：那些rotation矩阵将3D shape的空间$$\mathbb{R}^{3 \times K}$$分为了一个个equivalent class。而我们希望网络对于每一类equivalent class都只给出唯一一个输出。
 
-具体落实到模型的设计，我们是通过要求模型满足如下的要求来实现其具有transversal property的。
+## 3. [Procrustean Regression Networks: Learning 3D Structure of Non-Rigid Objects from 2D Annotations](https://arxiv.org/pdf/2007.10961.pdf)
 
-**Lemma1** 如果存在一个canonicalization function $$\Psi: \mathbb{R}^{3 \times K} \rightarrow \mathbb{R}^{3 \times K}$$满足对于任意的rotation $$R \in SO(3)$$以及任意的3D shape $$X \in \mathcal{X_0}$$，都有$$X = \Psi(RX)$$，那么这个集合$$\mathcal{X_0}$$具有transversal property。
+*ECCV 2020*
 
-也就是说，如果这个集合具有transversal property，那么这个canonicalization function可以将这个集合里的任意一个3D shape的任意的旋转都再映射回这个3D shape。
+[[CODE](https://github.com/sungheonpark/PRN)]
 
-对于C3DPO来说，这个lemma具体落实为下面的loss，用来约束viewpoint和pose的一个consistent的decomposition：
 
-$$\mathcal{l_2}(X,R,\Psi) = \frac{1}{K} \sum_{k=1}^K \lVert X_{:,k} - \Psi(RX) \rVert_{\epsilon}$$
 
-其中$$R \in SO(3)$$是一个随机的rotation，$$\Psi$$是一个神经网络，其和主网络$$\Phi$$一起训练。具体来说，对于一组输入2D keypoint，$$Y_n$$，首先通过$$\Phi(Y_n, v)$$来获取viewpoint和pose parameters $$\theta_n$$和$$\alpha_n$$，其就可以用来计算re-projection loss $$\mathcal{l_1$$了。同时，随机采样一个rotation $$\hat{R}$$，将其应用在$$\Phi$$得到的3D shape上，也就是$$X_n = X(\alpha_n; S)$$上，将$$\hat{R}X_n$$通过canonilisation function $$\Psi$$，$$\Psi$$会消除$$\hat{R}$$的影响，重新输出一个shape coefficient $$\hat{\alpha_n}$$，从而有$$\hat{X_n} = X(\hat{\alpha_n};S)$$，其应该和$$X_n$$一样，这是通过$$\mathcal{l_2}$$实现的。这两个loss联合训练从而同时训练$$\Phi$$和$$\Psi$$。fig2是流程图，fig3显示了缺失某个loss的影响。
 
 
 
@@ -361,96 +296,7 @@ $$J_{uv} = (k_s + k_d max \lbrace 0, \langle l, n_{uv} \rangle \rbrace) \dot a_{
 
 
 
-## 4. [Procrustean Regression Networks: Learning 3D Structure of Non-Rigid Objects from 2D Annotations](https://arxiv.org/pdf/2007.10961.pdf)
 
-*ECCV 2020*
-
-[[CODE](https://github.com/sungheonpark/PRN)]
-
-**Abstract**
-我们提出了一个从2D annotations上学习non-rigid物体的3D information的框架。最近有一些工作利用deep learning来研究NrSfM问题，从而实现3D reconstruction。NrSfM的最大的难点在于需要同时预测rotation和deformation，而之前的那些工作同时regress这两个变量。在这篇文章里，我们提出一个方法来自动计算好rotation。训练所用的cost function由一个reprojection error和aligned shapes的low rank term所组成，训练好的网络可以学习到物体的3D structures，比如说human skelotons或者faces，而inference只需要输入一张图片就可以了。而且本文提出的方法还可以处理有missing entries的输入（也就是2D keypoints不完整）。实验表明本文所提出的方法在Human 3.6M，300-VW和SURREAL数据集上都达到了sota的效果，即使我们的backbone网络十分简单。
-
-
-**1. Introduction**
-
-从一批2D keypoints数据里推断3D poses是一个理论上约束过少的问题（也就是说理论上无法得到最优解）。尤其是对于那些non-rigid物体，比如说human faces或者human bodies，从2D keypoints里推测3D poses就更难了，因为物体本身还会有deformations。
-
-目前有两种不同的方法从non-rigid物体的2D keypoints里获取3D shapes。第一种方法是使用某种3D reconstruction算法。NrSfM算法就是从一系列2D的keypoints里reconstruct non-rigid物体的3D shapes的算法。不过NrSfM算法并没有任何3D shape priors，所以其对于每个物体的2D keypoints输入，都需要独立的去处理，从而算法时间复杂度高。第二种方法是利用3D ground truth的数据，来学习从2D到3D的mapping。最近的方法都是使用神经网络来实现2D-3D或者image-3D的mapping的学习。然而，3D ground truth数据是很难获取的，这就大大限制了这类监督方法的应用前景。
-
-我们考虑，还存在另一种可能性：也就是一个将上述两种方法结合起来的框架，也就是利用deep learning来解决NrSfM。实际上，在这个方向已经有一部分工作了：[Unsupervised 3d reconstruction networks]()，[Deep non-rigid structure from motion]()，但是这些方法所研究的都是structure-from-category（SfC）问题，也就是输入的是同一个种类的不同个体的图片，而这些个体之间的deformation实际上很小。上述文章的实验证明，当deformation很大的时候，他们的算法的generalization效果不是很好。最近，[C3DPO: Canonical 3d Pose Networks for non-rigid structure from motion]()提出了一个网络，利用校准3D shapes来获得3D rigid motion，从单张图片里获取3D shapes。这篇论文里的方法对于更多种类的deformation效果更好。[Distill Knowledge from nrsfm for weakly supervised 3d pose learning]()利用知识蒸馏的方式从2D keypoints里获取3D shapes信息。
-
-NrSfM的主要困难在于模型需要同时预测rigid motion和non-rigid deformation，而这个困难在过去的20年里被深入的讨论和研究过。更难的是，motion和deformation有时候会被混淆，变得难以区分。之前有工作利用generalized procrustes analysis来解决这个问题。然而，最近的这些deep NrSfM都是同时来预测motion和deformation的。在这些方法里，只有[C3DPO: Canonical 3d Pose Networks for non-rigid structure from motion]()考虑了motion和deformation的分离问题。
-
-在这篇文章里，我们提出了一个新的方法来解决NrSfM问题：首先，我们证明一系列经过procrustes aligned后的shapes是transversal的。从而，我们就不需要显式的估计rigid motions，而是通过一个loss来约束。从而，我们就可以使得网络专注于预测3D shapes了，从而我们只需要比较简单的网络结构。我们所提出的框架，procrustean regression network (PRN)，就可以只从2D keypoints输入里获取3D structure了。
-
-fig 1说明了所提出的框架的流程。PRN以一系列图片或者2D keypoints作为输入。PRN训练所用的objective function是由reprojection error和aligned shapes之间的距离所组成的。整个训练过程是端到端的，而在inference的时候，只需要输入一张图片或者2D keypoints的sequence，就可以直接生成3D structure。大量的实验证明了我们所提出的方法的可行性。
-
-
-**3. Method**
-
-我们在3.1里将会介绍procrustean regression，其是基于procrustes-aligned shapes的regression，是PRN的基础。而且，我们还会介绍C3DPO那篇文章里所提到的shape transversality的概念，然后证明我们所得到的procrustes-aligned shapes是transversal的，从而证明Procrustes analysis是可以从shapes里恢复motion的。3.2将会介绍PRN的objective。3.3介绍训练时需要的额外的regularization term。3.4介绍网络结构以及训练方法。
-
-**3.1 Procrustean Regression**
-
-NrSfM的目标是从物体的2D keypoints里恢复3D shapes。具体来说，输入有$$n_f$$张图片，每张图片有$$n_p$$个2D keypoints，将其表示为$$U_i \in \mathbb{R}^{2 \times n_p}$$，其中$$1 \leq i \leq n_f$$，NrSfM的目的是对于每张图片，恢复其3D structure $$X_i \in \mathbb{R}^{3 \times n_p}$$。Procrustean regression（PR）将NrSfM问题表述为一个regression问题。PR的objective包含一个reprojection error和regularization term，前者用于衡量投影后的3D shapes和2D keypoints之间的差距，后者用于约束aligned shapes为一个low rank的矩阵：
-
-$$J = \sum\limits_{i=1}^{n_f} f(X_i) + \lambda g(\tilde{X}, \bar{X})$$
-
-其中$$X_i \in \mathbb{3 \times n_p}$$是第i张图片的3D shape，$$\bar{X}$$是Procrustes analysis的reference shape，$$\tilde{X} \in \mathbb{R}^{3n_p \times n_f}$$是aligned后的shape堆成的矩阵，也就是$$\tilde{X} = \left[ vec(\tilde{X_1}, vec(\tilde{X_2}, \cdots, vec(\tilde{X_{n_f}}), \right]$$，其中$$\tilde{X_i}$$表示第i个经过aligned之后的shape。而这些aligned shape $$\tilde{X_i}$$则是由Procrustes analysis计算得来的（没有考虑scaling）。换句话说，每个aligned shape的aligning rotation matrix是以如下的方式计算出来的：
-
-$$R_i = \mathop{\arg\min}\limits_{R} \lVert RX_iT - \bar{X} \rVert$$
-
-其中$$R^TR = I$$。上述式子里的$$T = I_{n_p} - \frac{1}{n_p} 1_{n_p} 1_{n_p}^T$$是使得shape位于图片中间的translation matrix。从而，对于每个预测的3D shape $$X_i$$，经由上述Procrustes analysis align之后得到的结果就是$$\tilde{X_i} = R_i X_i T$$。
-
-公式1里的$$\bar{X}$$和$$X_i$$将均作为输出被优化（并不需要自行计算$$\bar{X}$$）。
-
-**3.1.1 Transversal property**
-
-接下来我们介绍C3DPO这篇文章里所说的transversal property。
-
-**Definition 1** 如果对于集合$$\mathcal{X_0} \in \mathbb{R}^{3 \times n_p}$$里的任意两个元素$$X,X^{'}$$，$$X^{'} = RX$$，那么$$X=X^{'}$$，那么就说这个集合$$\mathcal{X_0}$$具有transversal property。
-
-上述的定义也就是说，对于一个具有transversal property的shape集合，它里面任意两个shape都不可能通过rigid transformation使它们完全重合，也就是说可以认为里面所有的shape都有canonical rigid pose。而我们可以发现，经过procrustes analysis之后的shape集合，就具有transversal property。
-
-
-**3.2 PR loss for neural networks**
-
-我们可以直接构建一个神经网络来预测公式1里的3D shape $$X_i$$和reference shape $$\bar{X}$$。然而，reference shapes在这种情况下可能会有一些问题。如果我们所处理的物体类别并不会有大的deformations，那么将reference shape作为一个global parameter是可行的。但如果它有较大的deformations（比如说human body），那训练的时候每个minibatch里的shapes不能够有较大的deformations就显得很重要（也就是每个minibatch里的shapes要相似）。在这种情况下，一个独立的来预测一个好的3D reference shape的模块就显得很重要。而且，多出来这样的一个模块会使得训练变得更加困难。为了让网络变得简单，我们不再将公式1里的$$\bar{X}$$当作一个需要被学习的输出，而是利用aligned 3D shapes的mean来表示它。从而$$\bar{X} = \sum\limits_{j=1}^{n_f} R_j X_j T$$。现在，$$X_i$$成了公式1里唯一需要被学习的输出，而objective $$J$$对于$$X_i$$的导数，$$\frac{\partial J}{\partial X_i}$$可以被理论计算出来。
-
-从而PRN的objective就可以重写为：
-
-$$\mathcal{J} = \sum\limits_{i=1}^{n_f} f(X_i) + \lambda g(\tilde{X})$$
-
-因为$$\bar{X}$$变了，所以procurstes analysis所计算的rotation也会变成：
-
-$$R = \mathop{\arg\min}\limits_{R} \sum\limits_{i=1}^{n_f} \lVert R_i X_i T - \frac{1}{n_f} \sum\limits_{j=1}^{n_f} R_jX_j T \rVert$$
-
-其中$$R_i^T R = I$$，$$R$$是所有的这样的$$R_i$$的concatenation：$$R = \left[ R_1, R_2, \cdots, R_{n_f} \right]$$。我们记$$X = \left[ vec(X_1), vec(X_2), \cdots, vec(X_{n_f}) \right]$$为所有的网络输出的未经过aligned的3D shapes构成的矩阵，记$$\tilde{X} = \left[ vec(\tilde{X_1}), vec(\tilde{X_2}), \cdots, vec(\tilde{X_{n_f}}) \right]$$为经过aligned之后的3D shapes构成的矩阵。从而$$\mathcal{J}$$相对于$$X$$的导数为：
-
-$$\frac{\partial \mathcal{J}}{\partial X} = \frac{\partial f}{\partial X} + \lambda \langle \frac{\partial g}{\partial \tilde{X}}, \frac{\partial \tilde{X}}{\partial X} \rangle$$
-
-其中$$\frac{\partial \tilde{X}}{\partial X}$$是可以被计算出来的（仅和$$X_i$$有关），很复杂，可以参考补充材料。而且当$$f$$和$$g$$确定之后，$$\frac{\partial f}{\partial X}$$和$$\frac{\partial g}{\partial \tilde X}$$也就可以被计算出来了。
-
-虽然对于$$\frac{\partial \tilde{X}}{\partial X}$$的推导过程很复杂，但实际上和我们的网络设计也没有关系，我们只需要数学上证明这个确实是可以计算出来的，具体的计算就交给反向传播了（也就是说验证其是differentiable的）。
-
-
-**3.3 $$f$$和$$g$$的设计**
-
-在PRN里，网络输出的是一个3D keypoint matrix（3D shape）。对于训练网络的objective里的data term $$f$$，我们使用所预测的3D shapes和ground truth的2D keypoints之间的reprojection error来衡量。在这篇文章里，我们考虑的是orthographic projection，考虑perspective projection也是一样的。$$f$$的具体计算方式如下：
-
-$$f(X) = \sum\limits_{i=1}^{n_f} \frac{1}{2} \lVert (U_i - P_o X_i ) \odot W_i \rVert_F^2$$
-
-这里的$$P_o = \begin{pmatrix}
-1 & 0 & 0 \\
-0 & 1 & 0
-\end{pmatrix}$$
-是一个大小为$$2 \times 3$$ orthographic projection matrix，$$U_i$$是一个$$2 \times n_p$$的矩阵，表示2D keypoints ground truth。$$W_i$$是一个$$2 \times n_p$$的weight矩阵，第$$i$$列表示对于第$$i$$个keypoint的confidence，$$W_i$$里的值范围在0到1，0表示这个keypoints因为occlusion而看不到。2D keypoint detectors的scores可以被用来生成$$W_i$$。上述公式里的$$\odot$$表示element-wise multiplication。
-
-对于regularization term，也就是$$g$$，我们对于aligned的shapes加上一个low-rank约束。常用的两种方法是log-determinant和nuclear norm（矩阵奇异值的和）。
-
-**3.4 Network Structure**
-
-这篇文章使用了两种网络结构，fully connected networks（FCN）和CNN。对于FCN结构，x,y的预测和z的预测用了不同的网络来分别得出，实验证明效果更好，如fig2所示。FCN的数据就仅仅只是2D keypoints的gt构成的sequence。对于CNN结构，输入网络的是RGB图片，使用resnet50作为backbone。最后一层卷积层大小为$$2048 \times 7 \times 7$$，再利用fully connected layer将其转换为3D keypoints矩阵输出。resnet的参数被设定为在imagenet上预训练过了的。
 
 
 
