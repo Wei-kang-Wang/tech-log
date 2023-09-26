@@ -21,7 +21,7 @@ tags: paper-reading
 
 ### 各种从3D representations渲染2D图片的办法
 
-* 在NeRF里，所有的相机都是置于某一个半球球面上，而场景假设位于半球的球心位置，也就是说，对于每一张view来说，相机focal length，以及scene大致距离相机的距离都是一样的，从而就没有了距离ambiguity的问题。而且对于每一张2D图片，长宽分别为$$W,H$$，从而2D图片上每一个像素点的坐标值就可以确定了，从而从该像素点到相机光心的射线就确定了，这样就可以沿着这条射线对neural radiance field function的每个空间坐标值得到的color和density进行积分，从而得到该2D图片像素点位置的预测值。
+* 在NeRF里，以Lego场景为例，数据的生成是利用blender构建一个scene，然后rotate以及translate整个场景，这个过程中相机不动，从而获取一系列views。而每个数据点包括这个view的图片，rotation matrix和translation构成的transformation matrix，而且数据里还包括了相机的focal length，而且每个view的图片的长宽相等。而在具体操作的时候，认为scene是不动的，从而相机角度和位置就会由rotation matrix以及translation matrix来决定，也就是说，认为scene的中心位于world coordiate的$$(0,0,0)$$处，而camera的world coordinate由translation matrix决定，角度由rotation matrix决定，从而每条从光心出发的射线就都确定下来了。
 
 ### 1. [NeRF: Representing Scenes as Neural Radiance Fields for View Synthesis](https://www.ecva.net/papers/eccv_2020/papers_ECCV/papers/123460392.pdf)
 
