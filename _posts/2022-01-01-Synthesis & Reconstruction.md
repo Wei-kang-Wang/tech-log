@@ -22,6 +22,22 @@ tags: paper-reading
 ### 各种从3D representations渲染2D图片的办法
 
 * 在NeRF里，以Lego场景为例，数据的生成是利用blender构建一个scene，然后rotate以及translate整个场景，这个过程中相机不动，从而获取一系列views。而每个数据点包括这个view的图片，rotation matrix和translation构成的transformation matrix，而且数据里还包括了相机的focal length，而且每个view的图片的长宽相等。而在具体操作的时候，认为scene是不动的，从而相机角度和位置就会由rotation matrix以及translation matrix来决定，也就是说，认为scene的中心位于world coordiate的$$(0,0,0)$$处，而camera的world coordinate由translation matrix决定，角度由rotation matrix决定，从而每条从光心出发的射线就都确定下来了。
+* 在[unsuper3d](https://openaccess.thecvf.com/content_CVPR_2020/papers/Wu_Unsupervised_Learning_of_Probably_Symmetric_Deformable_3D_Objects_From_Images_CVPR_2020_paper.pdf)里，depth的预测代码如下：
+```python
+self.canon_depth_raw = self.netD(self.input_im).squeeze(1)  # BxHxW
+self.canon_depth = self.canon_depth_raw - self.canon_depth_raw.view(b,-1).mean(1).view(b,1,1)
+self.canon_depth = self.canon_depth.tanh()
+self.canon_depth = self.depth_rescaler(self.canon_depth)
+```
+其中self.netD是一个网络，输入为RGB图片，也就是input_im，输出是大小等同于输入图片尺寸的，单通道的输出，无任何值域限制。也就是上述第一行。第二行将每张预测的depth map减去这个map的均值。第三行加上一个tanh()函数，将depth的值域限制在-1到1之间。最后，self.depth_rescaler()函数如下：$$lambda d: (1+d)/2 \times max-depth + (1-d)/2 \times min-depth$$。默认的max-depth=1.1，min-depth=0.9，
+```python
+## clamp border depth
+depth_border = torch.zeros(1,h,w-4).to(self.input_im.device)
+depth_border = nn.functional.pad(depth_border, (2,2), mode='constant', value=1)
+self.canon_depth = self.canon_depth*(1-depth_border) + depth_border *self.border_depth
+self.canon_depth = torch.cat([self.canon_depth, self.canon_depth.flip(2)], 0)  # flip
+```
+之后还会对图片边缘的depth进行处理，先构造一个depth_border，中心区域是0，周围宽度为2的为1，然后取负，加上1，乘以原self.canon_depth，也就是中心区域保留不动，边缘置零，边缘区域还要再加上self.border_depth = 0.7 x max-depth + 0.3 x min-depth。最终结果就是，最后的self.canon_depth的中心区域和之前预测的depth一样，边缘区域值都是self.border_depth。
 
 ### 1. [NeRF: Representing Scenes as Neural Radiance Fields for View Synthesis](https://www.ecva.net/papers/eccv_2020/papers_ECCV/papers/123460392.pdf)
 
