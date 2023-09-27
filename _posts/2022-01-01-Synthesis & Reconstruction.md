@@ -22,6 +22,7 @@ tags: paper-reading
 ### 各种从3D representations渲染2D图片的办法
 
 * 在NeRF里，以Lego场景为例，数据的生成是利用blender构建一个scene，然后rotate以及translate整个场景，这个过程中相机不动，从而获取一系列views。而每个数据点包括这个view的图片，rotation matrix和translation构成的transformation matrix，而且数据里还包括了相机的focal length，而且每个view的图片的长宽相等。而在具体操作的时候，认为scene是不动的，从而相机角度和位置就会由rotation matrix以及translation matrix来决定，也就是说，认为scene的中心位于world coordiate的$$(0,0,0)$$处，而camera的world coordinate由translation matrix决定，角度由rotation matrix决定，从而每条从光心出发的射线就都确定下来了。
+
 * 在[unsuper3d](https://openaccess.thecvf.com/content_CVPR_2020/papers/Wu_Unsupervised_Learning_of_Probably_Symmetric_Deformable_3D_Objects_From_Images_CVPR_2020_paper.pdf)里，depth的预测代码如下：
 ```python
 self.canon_depth_raw = self.netD(self.input_im).squeeze(1)  # BxHxW
