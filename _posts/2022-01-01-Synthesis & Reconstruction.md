@@ -78,7 +78,8 @@ self.canon_im = (self.canon_albedo/2+0.5) * canon_shading *2-1
 
 
 
-### 1. [NeRF: Representing Scenes as Neural Radiance Fields for View Synthesis](https://www.ecva.net/papers/eccv_2020/papers_ECCV/papers/123460392.pdf)
+### NeRF以及后续相关的重要文章
+#### 1. [NeRF: Representing Scenes as Neural Radiance Fields for View Synthesis](https://www.ecva.net/papers/eccv_2020/papers_ECCV/papers/123460392.pdf)
 
 *Ben Mildenhall, Pratul P. Srinivasan, Matthew Tancik, Jonathan T. Barron, Ravi Ramamoorthi, Ren Ng*
 
@@ -213,6 +214,10 @@ $$\mathcal L = \Sigma_{\pmb r in \mathcal R} \left[ \lVert \hat C_c (\pmb{r}) - 
 
 * 尽管我们提出了一个hierarchical sampling的方法使得渲染更加的高效，但在高效优化neural radiance field和采样的方向还有很多工作要做。另一个将来的方向是interpretability：sampled representations比如说voxel grids和meshes允许推理和思考所渲染的图片的效果以及失败的情况，但是将scenes表示为MLP的参数之后，我们就无法分析这些了。这篇文章推动了基于现实世界的graphics pipeline的发展，因为真实的objects和scenes现在可以被表示为neural radiance fields了，而多个objects或者scenes可以组合称为更复杂的scenes。
 
+#### 2. [NeRF--: Neural Radiance Fields Without Known Camera Parameters](https://nerfmm.active.vision/)
+
+* NeRF--基于NeRF，其做出的改进就是，NeRF需要知道相机内参，以及每张view对应的相机pose，也就是相机外参，包括相机的位置（translation决定）以及角度（rotation决定），而NeRF--认为这个要求太苛刻了（确实要求过高），于是将rotation和translation都综合到网络里来学习，其办法就是直接让网络以图片为输入，学习translation和rotation，具体来说，对于translation，直接学习一个长度为3的vector就行了，而对于rotation matrix，因为rotation matrix自身要求位于$$SO(3)$$空间内，所以作者使用Rodrigues公式来用向量表示rotation matrix，具体来说就是让网络输出一个长度为3的向量即可，其与rotation matrix一一对应。最后，对于相机内参，作者假设$$f_x = H/2, f_y=W/2$$，其中$$H,W$$分别是图片的长宽，从而就只需要估计相机的focal length就行了，这也是网络的输出，作者还要求所有的输入图片都是同一个相机拍摄的。
+* 这个方法可以得到不错的结果，但是有一个约束就是，输入图片只能有很小的transformation，也就是说rotation和translation都被限定在了一个很小的范围内，这是符合认知的，因为大角度的旋转或者大的translation是很难直接通过这种方式学到的，unsuper3d那篇文章其实也只对那些拥有小的rotation和translation的数据集进行了实验，它也解决不了大transformation的问题，比如说Human3.6m这种数据集。实际上如何进行变化很大的viewpoint的估计还是个开放性问题，magicpony也有提到。
 
 
 ### [GRAF: Generative Radiance Fields for 3D-Aware Image Synthesis](https://proceedings.neurips.cc/paper/2020/file/e92e1b476bb5262d793fd40931e0ed53-Paper.pdf)
