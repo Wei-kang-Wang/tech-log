@@ -147,7 +147,8 @@ Wasserstein GAN在推出的当时就得到了很多追捧，甚至Goodfellow也�
 
 WGAN算法如下：
 
-![WGAN_algorithm](../assets/images/WGAN_algorithm.jpg "WGAN Algorithm")
+![WGAN_algorithm]({{ '/assets/images/WGAN_algorithm.jpg' | relative_url }})
+{: style="width: 800px; max-width: 100%;"}
 
 实际上这几个改动都很简单，但效果确实是非常好的，这是一个优秀的工作所应该有的：扎实的理论分析，细小的改动，巨大的结果提升。
 
