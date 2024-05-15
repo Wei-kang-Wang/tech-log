@@ -17,26 +17,30 @@ tags: paper-reading
 
 ---
 
-## Generative Models
+## GAN
 
-### 1. [Generative Adversarial Nets](https://proceedings.neurips.cc/paper/2014/file/5ca3e9b122f61f8f06494c97b1afccf3-Paper.pdf)
+### [Generative Adversarial Nets](https://proceedings.neurips.cc/paper/2014/file/5ca3e9b122f61f8f06494c97b1afccf3-Paper.pdf)
 *Ian J. Goodfellow, Jean Pouget-Abadie, Mehdi Mirza, Bing Xu, David Warde-Farde-Farley, Sherjil Ozair, Aaron Courville, Yoshua Bengio*
 
 *NIPS 2014*
 
-**1. Abstract**
+这篇是GAN的开山之作。
 
-1. The abstract of this paper is very standard and unique. This abstract generally introduces the main concept of this paper, i.e., GAN, rather than introducing the problem and existing methods. This abstract is kind of like the Wikipedia introduction of some concept. If you are very confident that your paper is very novel and proposes a very useful idea, model or concept that can be recorded in this area, you can use this kind of writing style of abstract. This is very clear to the community, but not very clear to the people that do not know any about this area.
+GAN在很多领域都很火，包括image, NLP, music, audio等。GAN的核心思想来源于博弈论（game theory），其包括两个互相博弈/对抗的网络：generator和discriminator，它两互相博弈，互相被训练，互相成长，共同学习。现如今虽然已经是Diffusion model的世界了，但GAN模型很优雅，而且GAN的变种对如今的Diffusion的变种仍有启发意义。GAN已经可以被认为是生成模型的基础模型之一了。
 
-**2. Introduction**
+GAN虽然很强，但也有着不少缺点，最重要的就是其难以训练（难以收敛、loss抖动）以及需要大量的训练数据。
 
-2. This paper thinks that besides deep learning architectures, deep learning will learn the representations of data probability distributions over all kinds of data, including natural images, audio waveforms containing speech, symbols in natural language processing, etc. This idea is always held by Yoshua Bengio and his group.
+**1. Kullback-Leiber Divergence（KL散度）和Jesen-Shannon Divergence（JS散度）**
 
-3. Discriminative models in deep learning have already invovled into various kinds and solved many kinds of problems. But generative models, instead, still have lots of part remained mysterious. This due to the fact that in order to learn data distributions underlying generative models, you need many approximation methods to approximate the distribution in order to make calculation work. But this process will make the distribution unaccurate and even not working. So in this paper, they do not try to approximate the distributions, they use deep learning models to do this job.
+KL散度和JS散度是用来定量描述两个概率分布之间距离的metric。
 
-4. Generative adversarial models will contain two parts: the generative model and the discriminator model. The generative model aims to generate data that the discriminator model can not distinguish apart from true training data, and the discriminator model aims to distinguish between them. The final goal is to let the generative model to generative plausible data that the distriminator model can not distinguish.
+**(1). KL散度**
 
-5. In this paper, they use MLP as models for the generative and discriminator models, and in this case, this generative adversarial model is called generative adversarial net (GAN). The input of the generative model is random noise (usually a Guassion noise), and they want the generative model to map this random noise distribution to any distribution we want to fitting, i.e., the training data distribution.
+两个概率分布 $p(x)$ 和 $q(x)$之间的KL散度定义为：
+
+$$D_{KL}(p \Vert q) = \int_{x} p(x) log \frac{p(x)}{q(x)} dx$$
+
+由于 $-\int_{x} p(x) log \frac{p(x)}{q(x)} dx = \int_{x} p(x) log \frac{q(x)}{p(x)} dx = E_{p(x)} \left[ log \frac{q(x)}{p(x)} \right] \leq log E_{p(x)} \left[ \frac{q(x)}{p(x)} \right] = 0$（最后一个不等号由Jesen不等式而来），从而$D_{KL}(p \Vert q) \geq 0$，其中等号在$p(x)$与$q(x)$处处相等时成立。
 
 
 **3. Related work**
