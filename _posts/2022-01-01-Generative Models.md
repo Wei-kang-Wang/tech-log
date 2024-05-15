@@ -263,7 +263,7 @@ $$W(p_r, p_g) = \frac{1}{K} sup_{\Vert f \Vert_L \leq K} E_{x \sim p_r(x)} f(x) 
 
 如果我们用一组参数来定义一系列可能的函数$$f_w$$，将$$f$$的空间缩小到$$f_w$$空间内，此时求解上述形式的定义的右侧，就近似的变为求解以下形式：
 
-$$K \dot W(p_r, p_g) \approx \max_{w: \Vert f_w \Vert_L \leq K} E_{x \sim p_r(x)} f_w(x) - E_{x \sim p_g(x)} f_w(x)$$
+$$K \cdot W(p_r, p_g) \approx \max_{w: \Vert f_w \Vert_L \leq K} E_{x \sim p_r(x)} f_w(x) - E_{x \sim p_g(x)} f_w(x)$$
 
 而带参数的函数$$f_w$$太容易表示了，直接用神经网络来表示就可以了，而且由于神经网络的拟合能力强大，所以只要网络有一定的大小，可以认为用神经网络表示的$$f_w$$的集合虽然并非是所有满足$$\Vert f \Vert_L$$的函数的集合，但也已经是一个高度近似了。
 
