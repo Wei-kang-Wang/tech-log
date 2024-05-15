@@ -240,7 +240,7 @@ $$L(G, D^{\ast}) = 2D_{JS}(p_{r+\epsilon} \Vert p_{g+\epsilon}) - 2log2$$
 
 Wasserstein distance，又叫做Earth-Mover（EM）距离，对于两个分布 $$p_r(x)$$和$$p_g(x)$$，定义如下：
 
-$$W(p_r, p_g) = \inf_{\gamma \sim \Pi(p_r, p_g) E_{(x,y) \sim \gamma} \Vert x-y \Vert$$
+$$W(p_r, p_g) = inf_{\gamma \sim \Pi(p_r, p_g) E_{(x,y) \sim \gamma} \Vert x-y \Vert$$
 
 其中 $$\Pi(p_r, p_g)$$是$$p_r, p_g$$的所有可能的联合分布的集合，也就是说，$$\Pi(p_r, p_g)$$中的每个分布的边缘分布都是$$p_r$$和$$p_g$$。对于每个联合分布$$\gamma$$来说，可以从中采样$$(x,y) \sim \gamma$$得到一个真实样本$$x$$和生成样本$$y$$，并计算出这个样本对的距离$$\Vert x-y \Vert$$，然后对于所有这样的样本对的采样，计算在该联合分布$$\gamma$$下的期望值 $$E_{(x,y) \sim \gamma} \Vert x-y \Vert$$。而最后，在所有的这些可能的联合分布中，找到这个期望值的下界，也就是Wasserstein distance。
 
@@ -250,6 +250,43 @@ Wasserstein距离相对于JS散度，KL散度的一个优势在于，即使两�
 
 
 **4. 从Wasserstein距离到WGAN**
+
+既然Wasserstein距离有如此优越的性质，那么将其用作生成器的损失函数来衡量$$p_r$$与$$p_g$$的距离，不就可以产生有意义的梯度来更新生成器了吗？并且还能将$$p_g$$向$$p_r$$拉近。
+
+但问题是Wasserstein距离的定义里的$$inf_{\gamma \sim \Pi(p_r, p_g)}$$没法求解。于是牛逼的来了，作者使用了一个已有的定理，将Wasserstein距离的形式改为以下：
+
+$$W(p_r, p_g) = \frac{1}{K} sup_{\Vert f \Vert_L \leq K} E_{x \sim p_r(x)} f(x) - E_{x \sim p_g(x)} f(x)$$
+
+其中 $$K$$是任意的正常数。
+
+这个形式的定义的含义就是，在函数$$f$$的Lipschitz常数$$\Vert f \Vert_L$$不超过$$K$$的条件下，对所有可能满足条件的$$f$$取到$$E_{x \sim p_r(x)} f(x) - E_{x \sim p_g(x)} f(x)$$的上界，然后再除以$$K$$。
+
+如果我们用一组参数来定义一系列可能的函数$$f_w$$，将$$f$$的空间缩小到$$f_w$$空间内，此时求解上述形式的定义的右侧，就近似的变为求解以下形式：
+
+$$K \dot W(p_r, p_g) \approx \max_{w: \Vert f_w \Vert_L \leq K} E_{x \sim p_r(x)} f_w(x) - E_{x \sim p_g(x)} f_w(x)$$
+
+而带参数的函数$$f_w$$太容易表示了，直接用神经网络来表示就可以了，而且由于神经网络的拟合能力强大，所以只要网络有一定的大小，可以认为用神经网络表示的$$f_w$$的集合虽然并非是所有满足$$\Vert f \Vert_L$$的函数的集合，但也已经是一个高度近似了。
+
+最后，再考虑一下$$K$$。实际上这个$$K$$可以取任意值，只要不是无穷大就行。作者在WGAN中使用的方法是，直接将神经网络$$f_w$$的所有参数都限制在一个范围内，比如说$$\left[-c, c\right]$$，$$c$$可以是0.01等，此时梯度也会被限制在一个范围内，所以一定存在一个Lipschitz常数，虽然不知道，但无所谓，只是scaling而已，不影响梯度的方向。具体在算法实现的时候，每次梯度更新完毕，将其clip到这个区间里来就可以。
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
