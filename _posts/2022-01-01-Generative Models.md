@@ -147,7 +147,7 @@ Wasserstein GAN在推出的当时就得到了很多追捧，甚至Goodfellow也�
 
 WGAN算法如下：
 
-<div align=center>![WGAN_algorithm]({{ '/assets/images/WGAN_algorithm.jpg' | relative_url }})
+![WGAN_algorithm]({{ '/assets/images/WGAN_algorithm.jpg' | relative_url }})
 {: style="width: 800px; max-width: 100%;"}
 
 实际上这几个改动都很简单，但效果确实是非常好的，这是一个优秀的工作所应该有的：扎实的理论分析，细小的改动，巨大的结果提升。
@@ -289,7 +289,7 @@ $$L = E_{x \sim p_r(x)} f_w(x) - E_{x \sim p_g(x)} f_w(x)$$关于$$w$$的最大�
 最后，WGAN里有大量实验来验证框架的有效性，比较重要的有以下三点。
 
 * 第一，判别器所近似的Wasserstein距离（即判别器的loss的负数）与生成器的生成图片质量高度相关，如下图所示：
-<div align=center>![WGAN_result]({{ '/assets/images/WGAN_result.jpg' | relative_url }})
+![WGAN_result]({{ '/assets/images/WGAN_result.jpg' | relative_url }})
 {: style="width: 800px; max-width: 100%;"}
 * 第二，如果WGAN使用DCGAN架构，则二者生成的图片效果差不多，但WGAN可以使用别的架构也有不错的效果，此时DCGAN就不行了。
 * 第三，作者在所有实验中都未观察到mode collapse的现象，所以作者总结说这个问题应该被解决了。
