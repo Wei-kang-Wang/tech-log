@@ -32,7 +32,7 @@ GAN虽然很强，但也有着不少缺点，最重要的就是其难以训练�
 
 **1. Kullback-Leiber Divergence（KL散度）和Jesen-Shannon Divergence（JS散度）**
 
-KL散度和JS散度是用来定量描述两个概率分布之间距离的metric。
+KL散度和JS散度是用来定量描述两个概率分布之间距离的度量。
 
 **(1). KL散度**
 
@@ -42,10 +42,52 @@ $$D_{KL}(p \Vert q) = \int_{x} p(x) log \frac{p(x)}{q(x)} dx$$
 
 $$D_{KL}(p \Vert q)$$有如下性质：
 
-\item 由于 $$-\int_{x} p(x) log \frac{p(x)}{q(x)} dx = \int_{x} p(x) log \frac{q(x)}{p(x)} dx = E_{p(x)} \left[ log \frac{q(x)}{p(x)} \right] \leq log E_{p(x)} \left[ \frac{q(x)}{p(x)} \right] = 0$$（最后一个不等号由Jesen不等式而来），从而$$D_{KL}(p \Vert q) \geq 0$$，其中等号在$$p(x)$$与$$q(x)$$处处相等时成立。
+* 由于 $$-\int_{x} p(x) log \frac{p(x)}{q(x)} dx = \int_{x} p(x) log \frac{q(x)}{p(x)} dx = E_{p(x)} \left[ log \frac{q(x)}{p(x)} \right] \leq log E_{p(x)} \left[ \frac{q(x)}{p(x)} \right] = 0$$（最后一个不等号由Jesen不等式而来），从而$$D_{KL}(p \Vert q) \geq 0$$，其中等号在$$p(x)$$与$$q(x)$$处处相等时成立。
 
-\item $$D_{KL}(p \Vert q)$$并不是关于$$p(x)$$和$$q(x)$$对称的，即$$D_{KL}(p \Vert q)$$与$$D_{KL}(q \Vert p)$$并不一定相等。因此DL散度并不是一个数学上的metric（不满足交换律）。
+* $$D_{KL}(p \Vert q)$$并不是关于$$p(x)$$和$$q(x)$$对称的，即$$D_{KL}(p \Vert q)$$与$$D_{KL}(q \Vert p)$$并不一定相等。因此DL散度并不是一个数学上的metric（不满足交换律）。
 
+
+**(2). JS散度**
+
+JS散度也是描述两个概率分布之间的距离的度量，但JS散度是对称的，在这一点上比KL散度强。
+
+JS散度的定义为：
+
+$$D_{JS}(p \Vert q) = \frac{1}{2} D_{KL}(p \Vert \frac{p+q}{2}) + \frac{1}{2} D_{KL}(q \Vert \frac{p+q}{2})$$
+
+JS散度满足如下性质：
+
+* $$0 \leq D_{JS}(p \Vert q) = D_{JS}(q \Vert p) \leq 1$$
+
+有理论认为GAN之所以成功就是因为理论上，GAN衡量真实数据分布和生成数据分布之间的度量用的是对称的JS散度，而并非那些之前的maximum likelihood方法所用的不对称的KL散度。
+
+**2. GAN的结构**
+
+GAN包括两个部分：
+* 一个discriminator $$D$$，用来估计输入来自于真实数据集的概率。其优化目标是能够将真实数据与生成数据（即虚假数据）分隔开；
+* 一个generator $$G$$，用来生成数据。其输入是一个确定的概率分布所采样得到的随机变量$$z$$，$$z \sim p(z)$$，其中$$p(z)$$是已知的，比如说某个高斯分布。$$z$$的作用是给$$G$$的输入带来随机性（因为$$z$$就是个随机变量），从而带来diversity。
+
+在GAN的训练过程中，$$G$$和$$D$$会相互竞争：$$G$$要尽可能的想办法骗过$$D$$，而$$D$$要尽可能的区分真假数据。这是一个零和博弈过程，这个过程会同时训练$$D$$和$$G$$。
+
+用$$p_z$$来表示输入噪声$$z$$的分布（通常已知），用$$p_g$$表示$$G$$所生成的样本的分布，用$$p_r$$表示真实数据的分布。
+
+一方面，对于$$D$$的训练来说，其对于真实数据，要尽可能的给出大的概率，即$$\max_{D} E_{x \sim p_r(x)} log D(x)$$，对于生成数据，要尽可能的给出小的概率，即$$\max_{D} E_{z \sim p_z(z)} log(1-D(G(z)))$$，从而将这两个合在一起就得到了：
+
+$$\max_{D} E_{x \sim p_r(x)} log D(x) + E_{z \sim p_z(z)} log(1-D(G(z)))$$
+
+而另一方面，对于$$G$$的训练来说，其要尽可能的生成让$$D$$判断为真的生成数据，也就是：
+
+$$\min_{G} E_{z \sim p_z(z)} log(1-D(G(z)))$$
+
+将$$D$$的训练目标和$$G$$的训练目标合在一起，就得到了：
+
+$$\min_{G} \max_{D} E_{x \sim p_r(x)} log D(x) + E_{z \sim p_z(z)} log(1-D(G(z)))$$
+
+记 $$L(G,D) = E_{x \sim p_r(x)} log D(x) + E_{z \sim p_z(z)} log(1-D(G(z)))$$，其还可以写成：$$L(G,D) = E_{x \sim p_r(x)} log D(x) + E_{x \sim p_g(x)} log(1-D(x))$$。
+
+我们考虑如下两个问题：
+
+**(1). 对于$$\min_G \max_D L(G,D)$$来说，$$D$$的optimal是什么？**
 
 
 
