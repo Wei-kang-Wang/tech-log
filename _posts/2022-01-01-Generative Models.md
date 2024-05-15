@@ -40,7 +40,14 @@ KL散度和JS散度是用来定量描述两个概率分布之间距离的metric�
 
 $$D_{KL}(p \Vert q) = \int_{x} p(x) log \frac{p(x)}{q(x)} dx$$
 
-由于 $-\int_{x} p(x) log \frac{p(x)}{q(x)} dx = \int_{x} p(x) log \frac{q(x)}{p(x)} dx = E_{p(x)} \left[ log \frac{q(x)}{p(x)} \right] \leq log E_{p(x)} \left[ \frac{q(x)}{p(x)} \right] = 0$（最后一个不等号由Jesen不等式而来），从而$D_{KL}(p \Vert q) \geq 0$，其中等号在$p(x)$与$q(x)$处处相等时成立。
+$$D_{KL}(p \Vert q)$$有如下性质：
+
+\item 由于 $$-\int_{x} p(x) log \frac{p(x)}{q(x)} dx = \int_{x} p(x) log \frac{q(x)}{p(x)} dx = E_{p(x)} \left[ log \frac{q(x)}{p(x)} \right] \leq log E_{p(x)} \left[ \frac{q(x)}{p(x)} \right] = 0$$（最后一个不等号由Jesen不等式而来），从而$$D_{KL}(p \Vert q) \geq 0$$，其中等号在$$p(x)$$与$$q(x)$$处处相等时成立。
+
+\item $$D_{KL}(p \Vert q)$$并不是关于$$p(x)$$和$$q(x)$$对称的，即$$D_{KL}(p \Vert q)$$与$$D_{KL}(q \Vert p)$$并不一定相等。因此DL散度并不是一个数学上的metric（不满足交换律）。
+
+
+
 
 
 **3. Related work**
