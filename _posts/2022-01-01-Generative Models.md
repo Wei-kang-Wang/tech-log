@@ -240,7 +240,7 @@ $$L(G, D^{\ast}) = 2D_{JS}(p_{r+\epsilon} \Vert p_{g+\epsilon}) - 2log2$$
 
 Wasserstein distance，又叫做Earth-Mover（EM）距离，对于两个分布 $$p_r(x)$$和$$p_g(x)$$，定义如下：
 
-$$W(p_r, p_g) = inf_{\gamma \sim \Pi(p_r, p_g) E_{(x,y) \sim \gamma} \Vert x-y \Vert$$
+$$W(p_r, p_g) = inf_{\gamma \sim \Pi(p_r, p_g)} E_{(x,y) \sim \gamma} \Vert x-y \Vert$$
 
 其中 $$\Pi(p_r, p_g)$$是$$p_r, p_g$$的所有可能的联合分布的集合，也就是说，$$\Pi(p_r, p_g)$$中的每个分布的边缘分布都是$$p_r$$和$$p_g$$。对于每个联合分布$$\gamma$$来说，可以从中采样$$(x,y) \sim \gamma$$得到一个真实样本$$x$$和生成样本$$y$$，并计算出这个样本对的距离$$\Vert x-y \Vert$$，然后对于所有这样的样本对的采样，计算在该联合分布$$\gamma$$下的期望值 $$E_{(x,y) \sim \gamma} \Vert x-y \Vert$$。而最后，在所有的这些可能的联合分布中，找到这个期望值的下界，也就是Wasserstein distance。
 
