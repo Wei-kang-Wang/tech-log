@@ -89,6 +89,11 @@ $$\min_{G} \max_{D} E_{x \sim p_r(x)} log D(x) + E_{z \sim p_z(z)} log(1-D(G(z))
 
 **(1). 对于$$\min_G \max_D L(G,D)$$来说，$$D$$的optimal是什么？**
 
+$$L(G,D) = E_{x \sim p_r(x)} log D(x) + E_{x \sim p_g(x)} log (1-D(x)) = \int_x (p_r(x) log D(x) + p_g(x) log (1-D(x)) dx$$
+
+假设$$G$$给定，那么$$L(G,D)$$是关于函数$$D$$的一个泛函，记$$\tilde{x} = D(x), A=p_r(x), B=p_g(x)$$，那么上述积分号内部是关于$$\tilde{x}$$的一个泛函，记为$$f(\tilde{x}) = A log \tilde{x} + B log (1 - \tilde{x})$$。
+
+让$$f(\tilde{x})$$对$$\tilde{x}$$求导，并令导数等于0，可得$$D^{\ast}(x) = \tilde{x}^{\ast} = \frac{A}{A+B} = \frac{p_r(x)}{p_r(x)+p_g(x)}$$，这也就是在$$G$$固定的时候，最优的$$D$$。当$$G$$训练的很好的时候，即$$p_r(x)$$和$$p_g(x)$$很接近，此时最优的判别器$$D(x)=\frac{1}{2}$$。
 
 
 
