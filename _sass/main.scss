@@ -28,10 +28,10 @@ $crimson-color-dark:    #b71212;
 $orange-color:          #ff8f26;
 
 // Width of the content area
-$content-width:    800px !default;
+$content-width:    1200px !default;
 
-$on-palm:          600px !default;
-$on-laptop:        800px !default;
+$on-palm:          900px !default;
+$on-laptop:        1200px !default;
 
 // Use media queries like this:
 // @include media-query($on-palm) {
