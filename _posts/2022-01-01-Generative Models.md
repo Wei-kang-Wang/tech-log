@@ -113,62 +113,17 @@ $$D_{JS}(p_r \Vert p_g) = \frac{1}{2}(log4 + L(G, D^{\ast}))$$，即$$L(G, D^{\a
 * Mode collapse。$$G$$可能会陷入一种情况，其一直输出差不多的样本，不论输入$$z \sim p_z(z)$$如何改变。这样的现象叫做mode collapse。尽管$$G$$在这种情况下可能可以骗过$$D$$，但此时$$G$$被困在了一个variety很小的空间里，无法表达复杂的数据。
 * 缺乏好的evaluation metric。GAN的设计本身就不包括一个好的objective function来表示训练过程的好坏，即不知道何时该停止训练，以及如何比较各个GAN之间的好坏。
 
-**3. Related work**
+**4. 对GAN训练的改进**
 
-1. There are two kinds of former works on deep generative models. The first ones concentrated on building a probability distribution function, and these models are trained on maximizing the log likelihood, such as the deep Boltzmann machine. The biggest difficulty is that the calculation of sampling this distribution is hard, especially when the dimension is high. The other ones are called generative machines. They do not explicity construct the distribution, and they learn a model to approximate this distribution. There are intrinsic differences between these two kinds of methods. The first ones acutally learn the distribution, though using some kind of approximation method to make the calculation feasible, but in the end, you actually get a distribution, you can calculate the mean, variance and all kind of properties of this distirbution. But the other ones do not construct the distribution, and only learn a model to approximate this distribution. So in the end, we do not know what this distribution looks like. 
+基于以上的训练困难，前人们经过了很多经验总结，得出了以下几条经验，其中前五条用于使得GAN的训练能够更加快速的收敛，而后两条用来解决$$p_r(x)$$与$$p_g(x)$$可能位于低维流形上的问题。
 
-2. Variational Autoencoder (VAE) actually has similar ideas to this paper. And using a distriminator model to assist the generative model is also not novel, such as Noise-contrastive Estimation (NCE). 
-
-
-**4. Adversarial nets**
-
-1. Generator wants to learn the distribution of the input training data $$x$$, $$p_g$$. We give an example of GAN. Suppose there is a video game and it can generate images of the game, and now we want to learn a generator to generate the images of the game. Suppose that our display resolution is 4K, then each time we need to generate an image vector of length 4k. Each pixel could be considered as a random variable, thus this vector can be considered as a multi-dimensional ramdon variable of length 4k. We know that this vector is controled by the underlying game code, and this code is actually the underlying $$p_g$$ for this vector. Now how to let the generator to generate data? We define a prior on the input noise variable $$p_z(z)$$, this $$z$$ could be a 100 dimensional Guassion distribution with mean 0 and variable matrix I. The generator aims to map $$z$$ onto $$x$$, the generator model can be formed as $$G(z, \theta_g)$$. Return to our game example. In order to generate game images, one way is that we can conversly compile the game code, and know the underlying game code. In this way, we can acutally know how the game images are generated. This method can be considered similar to the methods described in the related work that aim to construct the underlying distribution. Another way is that we neglect the underlying code, we guess that this game is not very complicated, thus maybe there are only 100 variables underlying are used to control the generation of images. Thus we contructed a known distribution of dimension 100 $$z$$, and due to the fact that MLP is able to approximate any functions, we let this MLP to map the input $$z$$ into the image space $$x$$. 
-
-2. The discriminator $$D(x, \theta_d)$$ is also an MLP, and its output is a scalar value, for distinguishing between the true data and generated data. Thus actually $$D$$ is a two-label classifier. We know where our input data is from (true or generated), thus we can give them labels. 
-
-3. The training process involves training D and G simultaneously:
-
-$$\min_{G}\max_{D} V(D,G) = E_{x \sim p_{data}}\left[log D(x)\right] + E_{z \sim p_z(z)}\left[log(1-D(G(z)))\right]$$
-
-This is a two-player minimax game. When the G and D reach a stable state, they are actually arrive at a Nash equilibrium.
-
-4. Look at figure1. This example is simple. The input noise distribution of $$z$$ is a uniform distribution (the lower line of $$z$$ has equal intervals), and our $$x$$ is a Guassian distribution (the black dotted line). The arrows between the line of $$x$$ and $$z$$ is the mapping, i.e., generator. From plot (a) in figure1, we see that, at first, the mapping maps $$z$$ to the behind part of $$x$$, so the output distribution of this mapping is the green line in the plot, and the blue line is the discriminator. The next step, we update the discriminator, we can see that, the discriminator choose the margin in between of the mean of the true distribution and the generator output distribution, as shown in plot (b). Then we update the generator, we can see that the generator output distribution will move closer to the true distribution, in plot(c). And then we update discriminator, update generator, ..., and finally ,we get plot(d), in that the generaotr output will be the same to the true distribution and the discriminator will show a horizontal line indicating that it can not distinguish between true and generated data. 
-
-![GAN]({{ '/assets/images/GAN-1.PNG' | relative_url }})
-{: style="width: 800px; max-width: 100%;" class="center"}
-*Fig 1. An example of training process of a GAN.*
-
-5. Each training iteration of the training algorithm of GAN involves two steps. In the first step, there is a for loop, loops over $$m$$ times. And in each loop, we get $$m$$ true data and $$m$$ generated data from the generator, and then calculate the gradient of the minimax loss defined above to update the discriminator. In the second step, we sample another $$m$$ samples from the generator to calculate the gradient of the minimax loss with respect to the generator for updating it. The for loop iteration time $$k$$ in the first step, is a hyperparameter of this algorithm. In each training iteration, we need the generator and distriminator be at the same levle, i.e., the performance of one should be be much better than the other. Only in this case, we can make the training trackable. The decision of whether a GAN is trained well is also a difficult question, i.e., the iteration time of the training algorithm. This still remains a hot area and unsolved.
-
-6. One training tip is that, since when the discriminator trains well, the $$log(1-D(G(z)))$$ will be close to 0, thus the gradient will not be applicable, instead of minimizing $$log(1-D(G(z)))$$, we maxmizing $$log(D(G(z)))$$.
-
-
-**4. Theoretical Results**
-
-1. There is a global optimum for the generator, $$p_g = p_{data}$$. Firstly, we see a lemma firstly. **Lemma**: if the generator is fixed, then the optimal discriminator will be
-
-$$ D_{G}^{\*}(x) = \frac{p_{data}(x)}{p_{data}(x) + p_g(x)} $$
-
-i.e., the error probability (the training criterion of discriminator) of the distriminator will be the smallest. **Theorem**: Setting $$ D_{G}^{\*}(x) = \frac{p_{data}(x)}{p_{data}(x) + p_g(x)} $$ as in Lemma in the equation $$\min_{G}\max_{D} V(D,G) = E_{x \sim p_{data}}\left[log D(x)\right] + E_{z \sim p_z(z)}\left[log(1-D(G(z)))\right]$$, we can get $$C(G) = E_{x \sim p_{data}}\left[log \frac{p_{data}(x)}{p_{data}(x) + p_g(x)}\right] + E_{x \sim p_g}\left[log \frac{p_g(x)}{p_{data}(x) + p_g(x)} \right] $$. Then $$C(G)$$ get its minimum when $$p_g = p_{data}$$.
-
-2. The algorithm described above is able to train the discriminator and the generator, i.e., the training algorithm is convergent. 
-
-
-**5. Experiments**
-
-The experiments in this paper is not good enough and quite simple.
-
-
-**6. Conclusion**
-
-GAN is actually an unsupervised learning setting, but it leverages supervised learning framework by using the label of true or generated data for training. This idea insights the future self-supervised learning frameworks.
-
-
-**The conclusion of writing style of this paper**
-
-This paper proposes a very novel idea and model, thus it elaborates the details of design and ideas behind GAN very clearly. The authors are very ambitious and are confident that this work will be recorded in this area. So the whole writing style is kind of like Wikipedia, i.e., the very detailed description of the proposed model, with a little mention of existing works and comparison with other works. Also, experiments are few.
-
-If you are confident that your work is novel and very important, you can use this kind of writing style. Otherwise, you need to describe clearly the existing works and your contribution to this problem.
+* Feature matching。feature matching的意思是是训练$$D$$的时候，不仅要辨别$$p_r(x)$$和$$p_g(x)$$，还要辨别这两个分布的统计量，即在损失函数中加上一项$$\Vert E_{x \sim p_r(x)} f(x) - E_{x \sim p_g(x)} f(x) \Vert_2$$，其中$$f(x)$$可以是任意的统计量，比如median，mean等。 
+* Minibatch Discrimination。对于$$D$$的训练来说，使用一个minibatch计算的loss来训练，而并非单个数据。
+* Historical Averaging。对于$$G$$和$$D$$的参数，加上一项$$\Vert \theta_{t+1} - \frac{1}{t} \sum_{i=1}^t \theta_i \Vert_2$$在损失函数之中，其中$$\theta_t$$为当前step的某个参数，$$\theta_{i}$$为过去的时刻的参数，这样可以让参数的变化更平缓。
+* One-sided Label Smoothing。对于真实数据和生成数据的标签，不要给成1.0和0.0，而是给成0.9和0.1，给一定的余量，可以增强网络的鲁棒性。
+* Virtual Batch Normalization (VBN)。对于每个batch的输入，对其做batch normalization，但所用的mean和variance并非由该batch计算得来，而是由在训练之初就指定好的一组数据计算得来（也就是说mean和variance是不变的）。
+* Adding noise。对于真实数据和生成数据，在其喂给$$D$$之前，加上已知的全局弥漫的噪声，比如高斯，这样使得两个数据分布不再位于低维流形中（这个方法也被用在diffusion model里面）。
+* Use better metric of distribution similarity。由之前可知，在判别器$$D$$最优的时候，GAN的损失函数等价于$$p_r(x)$$和$$p_g(x)$$之间的JS距离，但在$$p_r(x)$$与$$p_g(x)$$的support交集很小的时候，JS散度没有意义。可以用之前的方法加噪声让它们的support的交集变大，还可以直接更换掉JS散度，用新的度量来设计损失函数，比如说Wasserstein distance。
 
 
 ### 2. [Auto-Encoding Variational Bayes](https://openreview.net/forum?id=33X9fd2-9FyZd)
