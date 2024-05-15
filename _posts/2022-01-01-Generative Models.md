@@ -126,6 +126,46 @@ $$D_{JS}(p_r \Vert p_g) = \frac{1}{2}(log4 + L(G, D^{\ast}))$$，即$$L(G, D^{\a
 * Use better metric of distribution similarity。由之前可知，在判别器$$D$$最优的时候，GAN的损失函数等价于$$p_r(x)$$和$$p_g(x)$$之间的JS距离，但在$$p_r(x)$$与$$p_g(x)$$的support交集很小的时候，JS散度没有意义。可以用之前的方法加噪声让它们的support的交集变大，还可以直接更换掉JS散度，用新的度量来设计损失函数，比如说Wasserstein distance。
 
 
+### [Wasserstein GAN](https://arxiv.org/pdf/1701.07875)
+*Martin Arjovsky, Soumith Chintala, Leon Bottou*
+
+*ICML 2017*
+
+Wasserstein GAN在推出的当时就得到了很多追捧，甚至Goodfellow也跟帖讨论，Wasserstein GAN（WGAN）成功的做到了以下几点：
+
+* 彻底解决了GAN训练不稳定的问题，不再需要小心平衡生成器和判别器的训练程度了。
+* 基本解决了Mode collapse的问题，确保了生成样本的多样性。
+* 训练过程终于有了一个像交叉熵、准确率这样的数值来指示训练的进程，这个数值越小代表GAN训练的越好，代表生成器产生的图像质量越高。
+* 并不需要精心设计的网络架构，普通的MLP就可以。
+
+作者花了两篇论文来从头到尾来从GAN到WGAN，第一篇论文[Towards Principled Methods for Training Generative Adversarial Networks](https://arxiv.org/pdf/1701.04862)里面推导了理论结果，分析了GAN存在的问题，也针对性的给出了理论改进。第二篇论文[Wasserstein GAN](https://arxiv.org/pdf/1701.07875)，从理论改进推导出了更多的定理，从而给出了最终的改进算法。而且实际上最终的改进算法相对于原始的GAN只有以下四点改进：
+
+* 判别器的最后一层去掉sigmoid函数。
+* 生成器和判别器的loss不再取log了。
+* 每次更新判别器参数的时候，将参数的绝对值截断到一个固定常数$$c$$以内。
+* 不要用基于动量的优化算法来更新参数（比如momentum、Adam等），推荐RMSProp，SGD等。
+
+WGAN算法如下：
+
+![WGAN_algorithm](/assets/img/philly-magic-garden.jpg "WGAN Algorithm")
+
+实际上这几个改动都很简单，但效果确实是非常好的，这是一个优秀的工作所应该有的：扎实的理论分析，细小的改动，巨大的结果提升。
+
+以下从五个部分来分析WGAN：
+
+* 原始的GAN的问题
+* WGAN之前的一个过渡解决方案
+* Wasserstein distance的优越性
+* 从Wasserstein distance到WGAN
+* 总结
+
+WGAN源码实现：[martinarjovsky/WassersteinGAN](https://github.com/martinarjovsky/WassersteinGAN)
+
+
+
+
+
+
 ### 2. [Auto-Encoding Variational Bayes](https://openreview.net/forum?id=33X9fd2-9FyZd)
 
 *ICLR 2014*
