@@ -17,6 +17,30 @@ tags: paper-reading
 
 ---
 
+## 生成模型（generative models）概述
+
+2022年，CV提出了diffusion models，NLP提出了ChatGPT，它们都大大超越了之前视觉和语言生成模型的效果，可谓是AIGC元年，让生成模型再一次火了一把。
+
+![generative model]({{ '/assets/images/generative_model_1.png' | relative_url }})
+{: style="width: 800px; max-width: 100%;"}
+
+生成模型的本质，实际上就是希望能够从已有的数据来表达背后隐藏着的描述该数据的概率分布，从而我们可以从这个概率分布采样，来得到新的数据，即生成。
+
+至于如何描述概率分布，如何表示这个概率分布，不同的模型有着不同的方法，但它们大致可以被归纳为两种范式：
+* 对数据的采样过程建模
+* 对概率密度函数建模
+
+前者并不纠结于数据分布的概率密度函数到底长什么样，而且通过其它方式来达到表达该概率密度函数的目的，因此也被称为隐式生成模型（implicit generative models）；而后者直接让模型去估计概率密度函数，因此被称为显式生成模型（explicit generative models）。
+
+**(1). 隐式生成模型**
+
+
+**(2). 显式生成模型**
+
+![explicit model]({{ '/assets/images/generative_model_2.png' | relative_url }})
+{: style="width: 800px; max-width: 100%;"}
+
+
 ## GAN
 
 ### [Generative Adversarial Nets](https://proceedings.neurips.cc/paper/2014/file/5ca3e9b122f61f8f06494c97b1afccf3-Paper.pdf)
@@ -309,81 +333,9 @@ WGAN既解决了训练不稳定的问题，也提供了一个可靠的训练进�
 
 
 
+## Diffusion Models
 
-
-### 2. [Auto-Encoding Variational Bayes](https://openreview.net/forum?id=33X9fd2-9FyZd)
-
-*ICLR 2014*
-
-
-### 3. [Unsupervised 3D Shape Completion through GAN Inversion](https://graphics.stanford.edu/courses/cs348n-22-winter/PapersReferenced/Zhang%20et%20al.%20-%202021%20-%20Unsupervised%203D%20Shape%20Completion%20through%20GAN%20Inversion.pdf)
-
-*CVPR 2021*
-
-
-### 4. [EG3D: Efficient Geometry-aware 3D Generative Adversarial Networks](https://nvlabs.github.io/eg3d/)
-
-[POST](https://nvlabs.github.io/eg3d/)
-
-*CVPR 2022*
-
-
-### 5. [CariGANs: Unpaired Photo-to-Caricature Translation](https://ai.stanford.edu/~kaidicao/carigan.pdf)
-
-[POST](https://cari-gan.github.io/)
-
-*SIGGRAPH Asia 2018*
-
-
-### 6. [3DN: 3D Deformation Network](https://openaccess.thecvf.com/content_CVPR_2019/papers/Wang_3DN_3D_Deformation_Network_CVPR_2019_paper.pdf)
-
-[CODE](https://github.com/laughtervv/3DN)
-
-*CVPR 2019*
-
-
-### 7. [High-Resolution Image Synthesis and Semantic Manipulation with Conditional GANs](https://openaccess.thecvf.com/content_cvpr_2018/papers/Wang_High-Resolution_Image_Synthesis_CVPR_2018_paper.pdf)
-
-[POST](https://tcwang0509.github.io/pix2pixHD/)
-
-*CVPR 2018*
-
-
-### 8. [Polymorphic-GAN: Generating Aligned Samples Across Multiple Domains With Learned Morph Maps](https://openaccess.thecvf.com/content/CVPR2022/html/Kim_Polymorphic-GAN_Generating_Aligned_Samples_Across_Multiple_Domains_With_Learned_Morph_CVPR_2022_paper.html)
-
-*CVPR 2022*
-
-
-### 9. [Self-Supervised Object Detection via Generative Image Synthesis](https://openaccess.thecvf.com/content/ICCV2021/html/Mustikovela_Self-Supervised_Object_Detection_via_Generative_Image_Synthesis_ICCV_2021_paper.html)
-
-*ICCV 2021*
-
-
-### 10. [Roof-GAN: Learning To Generate Roof Geometry and Relations for Residential Houses](https://openaccess.thecvf.com/content/CVPR2021/html/Qian_Roof-GAN_Learning_To_Generate_Roof_Geometry_and_Relations_for_Residential_CVPR_2021_paper.html)
-
-*CVPR 2021*
-
-
-### 11. [CLIP: Learning Transferable Visual Models From Natural Language Supervision](http://proceedings.mlr.press/v139/radford21a/radford21a.pdf)
-
-*ICML 2021*
-
-
-### 12. [MA-CLIP: Towards Modality-Agnostic Contrastive Language-Image Pre-training](https://openreview.net/forum?id=ROteIE-4A6W&referrer=%5Bthe%20profile%20of%20Yu%20Cheng%5D(%2Fprofile%3Fid%3D~Yu_Cheng1))
-
-*Arxiv 2022*
-
-
-
-## [Layout to image generation论文](https://paperswithcode.com/task/layout-to-image-generation)
-
-这个是从scene graph生成image的benchmarks还有相关的论文的网页。
-
-### 1. [Image Generation from Scene Graphs](https://openaccess.thecvf.com/content_cvpr_2018/CameraReady/0764.pdf)
-
-*CVPR 2018*
-
-
+而现在提到图像领域的生成模型，diffusion模型（扩散模型）可谓是绝对的主流，而DDPM（denoising-based diffusion probabilistic models）因为其简单的推导和便于理解的框架，是用来表示diffusion模型原理的最火的范式。然而在DDPM之前，还有另一种范式，也可以用来描述扩散模型。其基于一类更广泛的模型（分数模型，score networks），叫做NCSN（noise conditional score networks）。它与DDPM类似，也是对数据进行加噪，其生成过程的本质也是在去噪。在大的层面上来看，DDPM与NCSN本质相同，DDPM也可以看作分数模型的一种特例。
 
 
 
