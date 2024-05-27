@@ -21,11 +21,11 @@ tags: paper-reading
 
 *CVPR 2024*
 
-*Zizhang Li, Dor Litvak, Ruining Li, Yunzhi Zhang, Tomas Jakab, Christian Rupprecht, Shangzhe Wu1, Andrea Vedaldi3, Jiajun Wu1*
+*Zizhang Li, Dor Litvak, Ruining Li, Yunzhi Zhang, Tomas Jakab, Christian Rupprecht, Shangzhe Wu, Andrea Vedaldi, Jiajun Wu*
 
 *Stanford University, UT Austin, University of Oxford*
 
-![general]({{ '/assets/images/3dfauna_1.jpg' | relative_url }})
+![general]({{ '/assets/images/fauna_1.png' | relative_url }})
 {: style="width: 800px; max-width: 100%;"}
 
 
