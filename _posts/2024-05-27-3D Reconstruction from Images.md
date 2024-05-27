@@ -30,6 +30,9 @@ tags: paper-reading
 
 ![1]({{ '/assets/images/recon_1.gif' | relative_url }}){: style="width: 600px; max-width: 100%;"} | ![2]({{ '/assets/images/recon_2.gif' | relative_url }}){: style="width: 600px; max-width: 100%;"}
 
+![3]({{ '/assets/images/interpolation.gif' | relative_url }})
+{: style="width: 600px; max-width: 100%;"}
+
 
 
 
