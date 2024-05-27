@@ -25,3 +25,17 @@ tags: paper-reading
 
 *Stanford University, UT Austin, University of Oxford*
 
+![general]({{ '/assets/images/3dfauna_1.jpg' | relative_url }})
+{: style="width: 800px; max-width: 100%;"}
+
+
+
+
+
+
+
+
+
+
+
+
