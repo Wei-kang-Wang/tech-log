@@ -65,6 +65,16 @@ tags: paper-reading
 
 之所以要将skinned model扩展为semantic bank skinned model（也就是扩展$$S_{base}$$），而不是直接让$$S_{instance}$$来model不同categories之间的差异是因为这样的话，这个$$S_{instance}$$就会太大了，这就导致这个模型不够tight了，就会导致deformation和viewpoint prediction之间的ambiguity。为了避免这个问题，为了让$$S_{instance}$$还是足够的小，就选择对$$S_{base}$$进行了改变。
 
+注意在实现细节上，SBSM字典里的每个key对应的value并不直接由shape来表示（即mesh里的vertices和faces），而是表示为类似于keys的vectors，然后对于每张图片，得到一个这些表示values的vectors的linear combination，将这个combination作为输入给一个可学习的网络，输出$$V$$和$$F$$，分别表示base的vertices的位置，以及faces覆盖情况，即$$S_{base}$$。而后续的$$S_{instance}$$以及$$S_{posing}$$就不再学习faces了，只对vertices的位置进行调整。
+
+在具体的实现细节上，这个输出$$S_{base}$$的网络，由一个MLP实现，而这个$$S_{base}$$实际上是表示为了一个SDF。输出$$S_{instance}$$的网络，输出的仅仅是每个vertices的一个位移，加在$$S_{base}$$上，就实现了deformations。而对于$$S_{posing}$$，本文使用了和MagicPony一样的假设，设计了一个quadrupedal skeleton，并预测了一个rigid body transformation以及多个relative rotations，用来进行camera的位姿调整，以及身体各个部分的articulation，这些预测的transformation/rotations被用在$$S_{base}+S_{instance}$$的vertices上（具体做法叫做linear blend skinning equation，参考SMPL论文），从而实现了最终vertices位置的确定，再加上之间预测的faces，就有了完整的mesh了。
+
+在有了mesh之后，就剩下了texturing。本文还设计了网络用来预测albedo和lighting，用标准的Lambertian illumination model来进行上色（和Shangzhe Wu之间的很多论文所用的方法一致）。
+
+
+
+
+
 
 
 
