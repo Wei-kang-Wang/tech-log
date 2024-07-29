@@ -1,7 +1,7 @@
 ---
 layout: post
 comments: false
-title: "3D Reconstruction from Images"
+title: "Mesh-based 3D Reconstruction from Images"
 date: 2024-05-27 01:09:00
 tags: paper-reading
 ---
