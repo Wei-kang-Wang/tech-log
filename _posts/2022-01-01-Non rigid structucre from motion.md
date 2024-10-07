@@ -22,7 +22,9 @@ tags: paper-reading
 
 [[CODE](https://github.com/facebookresearch/c3dpo_nrsfm)]
 
-这篇文章解决的问题是NrSfM，输入是同一个物体的不同角度的views的2D keypoints annotations，也就是一个$$2 \times K$$的矩阵，$$K$$是超参数，keypoints的数量，输出是该物体的3D keypoints，也就是3D shape，大小为$$3 \times K$$。输入并不是RGB图片。
+这篇文章解决的问题是NrSfM，输入是同一个物体的不同角度的views的2D keypoints annotations，也就是一个$$2 \times K$$的矩阵和一个$$1 \times K$$的0，1矩阵用来表示keypoints的visibility，$$K$$是超参数，keypoints的数量，输出是该物体的3D keypoints，也就是3D shape，大小为$$3 \times K$$。输入并不是RGB图片。
+
+> 注意，visibility矩阵非常重要，其在两个地方都有作用：1）其是作为factorization network $$\phi$$的输入的。具体来说，网络首先将keypoint矩阵和visibility矩阵相乘（从而invisible的那些列就是0了），再将乘积后的矩阵和visibility矩阵align，得到$$3 \times K$$的矩阵输入给$$\phi$$得到feature，再进行后续的shape coefficient和viewpoint的预测。2）在reprojection loss里，只计算那些可见keypoint的projected 2d keypoints和gt keypoints之间的差异。
 
 这篇文章的亮点在于，作为2019年的文章，还处于使用deep learning解决NrSfM问题的中期，在现在来看方法并不复杂，但好的效果和好的可视化整体来看是不错的。文章的主要想法是要将由物体的rigid motion transformation导致的2D keypoints不同，与物体形变（比如人体视频不同帧因为动作变化导致的物体形变）导致的不同区分开。文章是通过引入两个loss来解决这个问题。
 
@@ -40,15 +42,11 @@ tags: paper-reading
 
 流程图如下：
 
-![C3DPO-1]({{ '/assets/images/C3DPO-1.PNG' | relative_url }})
+![C3DPO-1]({{ '/assets/images/C3DPO-1.png' | relative_url }})
 {: style="width: 800px; max-width: 100%;"}
 
 
-**技术细节**
-
-* 网络并不是直接输出的rotation matrix，而是输出了一个长度为3的向量，然后经过hat operator和matrix exponential计算，得到了rotation matrix
-* hat operator: https://en.wikipedia.org/wiki/Hat_operator
-* matrix exponential: https://en.wikipedia.org/wiki/Matrix_exponential
+> 注意，网络并不是直接输出的rotation matrix，而是输出了一个长度为3的向量，然后经过hat operator和matrix exponential计算，得到了rotation matrix。参考[hat operator](https://en.wikipedia.org/wiki/Hat_operator)，[matrix exponential](https://en.wikipedia.org/wiki/Matrix_exponential)
 
 
 
