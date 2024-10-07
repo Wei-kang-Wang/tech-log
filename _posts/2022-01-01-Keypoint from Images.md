@@ -66,7 +66,7 @@ hourglass网络的设置如下：卷积层和max pooling层将输入图片的分
 本文详细阐述了使用hourglass模块构造成的网络对于human pose estimation任务的效果。intermediate supervision对于好的效果来说是很必要的。虽然说还有一些问题没有解决，但是本文提出的方法对于绝大多数情况下的human pose estimation的效果还是很好的。
 
 
-### \[**{CVPR 2017** $$\&$$  **TPAMI 2019**\] [OpenPose: Realtime Multi-Person 2D Pose Estimation Using Part Affinity Fields](https://arxiv.org/pdf/1812.08008.pdf)
+### \[**CVPR 2017** $$\&$$  **TPAMI 2019**\] [OpenPose: Realtime Multi-Person 2D Pose Estimation Using Part Affinity Fields](https://arxiv.org/pdf/1812.08008.pdf)
 *Zhe Cao, Gines Hidalgo, Tomas Simon, Shih-En Wei, and Yaser Sheikh*
 
 
@@ -194,7 +194,7 @@ $$ \max\limits_{Z} E = \Sigma_{c=1}^C \max\limits_{Z_c} E_c $$
 
 
 
-### \[$$\pmb{CVPR \  2019}$$\] [D2-Net: A Trainable CNN for Joint Description and Detection of Local Features](https://openaccess.thecvf.com/content_CVPR_2019/papers/Dusmanu_D2-Net_A_Trainable_CNN_for_Joint_Description_and_Detection_of_CVPR_2019_paper.pdf)
+### \[**CVPR 2019**\] [D2-Net: A Trainable CNN for Joint Description and Detection of Local Features](https://openaccess.thecvf.com/content_CVPR_2019/papers/Dusmanu_D2-Net_A_Trainable_CNN_for_Joint_Description_and_Detection_of_CVPR_2019_paper.pdf)
 
 *Mihai Dusmanu, Ignacio Rocco, Tomas Pajdla, Marc Pollefeys, Josef Sivic, Akihiko Torri, Torsten Sattler*
 
@@ -268,30 +268,28 @@ $$s_{ij} = \gamma_{ij} / \Sigma_{(i^{'}, j^{'})} \gamma_{i^{'}j^{'}}$$
 
 
 
-### \[$$\pmb{ICCV \  2019}$$\] [Joint Learning of Semantic Alignment and Object Landmark Detection](https://openaccess.thecvf.com/content_ICCV_2019/html/Jeon_Joint_Learning_of_Semantic_Alignment_and_Object_Landmark_Detection_ICCV_2019_paper.html)
+### \[**ICCV 2019**\] [Joint Learning of Semantic Alignment and Object Landmark Detection](https://openaccess.thecvf.com/content_ICCV_2019/html/Jeon_Joint_Learning_of_Semantic_Alignment_and_Object_Landmark_Detection_ICCV_2019_paper.html)
 
 
-### \[$$\pmb{CVPR \  2020}$$\] [Transferring Dense Pose to Proximal Animal Classes](https://openaccess.thecvf.com/content_CVPR_2020/papers/Sanakoyeu_Transferring_Dense_Pose_to_Proximal_Animal_Classes_CVPR_2020_paper.pdf)
+### \[**CVPR 2020**\] [Transferring Dense Pose to Proximal Animal Classes](https://openaccess.thecvf.com/content_CVPR_2020/papers/Sanakoyeu_Transferring_Dense_Pose_to_Proximal_Animal_Classes_CVPR_2020_paper.pdf)
 
 [POST](https://gdude.de/densepose-evolution/)
 [CODE](https://github.com/asanakoy/densepose-evolution)
 
 
-### \[$$\pmb{WACV \  2021}$$\] [Conditional Link Prediction of Category-Implicit Keypoint Detection](https://openaccess.thecvf.com/content/WACV2021/html/Yi-Ge_Conditional_Link_Prediction_of_Category-Implicit_Keypoint_Detection_WACV_2021_paper.html)
+### \[**WACV 2021**\] [Conditional Link Prediction of Category-Implicit Keypoint Detection](https://openaccess.thecvf.com/content/WACV2021/html/Yi-Ge_Conditional_Link_Prediction_of_Category-Implicit_Keypoint_Detection_WACV_2021_paper.html)
 
 
-### \[$$\pmb{ICCV \  2021}$$\] [On Equivariant and Invariant Learning of Object Landmark Representations](https://openaccess.thecvf.com/content/ICCV2021/html/Cheng_On_Equivariant_and_Invariant_Learning_of_Object_Landmark_Representations_ICCV_2021_paper.html)
+### \[**ICCV 2021**\] [On Equivariant and Invariant Learning of Object Landmark Representations](https://openaccess.thecvf.com/content/ICCV2021/html/Cheng_On_Equivariant_and_Invariant_Learning_of_Object_Landmark_Representations_ICCV_2021_paper.html)
 
 
-### \[$$\pmb{WACV \  2021}$$\] [Learning of Low-Level Feature Keypoints for Accurate and Robust Detection](https://openaccess.thecvf.com/content/WACV2021/html/Suwanwimolkul_Learning_of_Low-Level_Feature_Keypoints_for_Accurate_and_Robust_Detection_WACV_2021_paper.html)
+### \[**WACV 2021**\] [Learning of Low-Level Feature Keypoints for Accurate and Robust Detection](https://openaccess.thecvf.com/content/WACV2021/html/Suwanwimolkul_Learning_of_Low-Level_Feature_Keypoints_for_Accurate_and_Robust_Detection_WACV_2021_paper.html)
 
 
 
 ## 2D keypoints from images (Unsupervised)
 
-### \[$$\pmb{ICCV \  2017}$$\] [Unsupervised learning of object landmarks by factorized spatial embeddings](https://openaccess.thecvf.com/content_ICCV_2017/papers/Thewlis_Unsupervised_Learning_of_ICCV_2017_paper.pdf)
-
-*ICCV 2017*
+### \[**ICCV 2017**\] [Unsupervised learning of object landmarks by factorized spatial embeddings](https://openaccess.thecvf.com/content_ICCV_2017/papers/Thewlis_Unsupervised_Learning_of_ICCV_2017_paper.pdf)
 
 [CODE](https://github.com/alldbi/Factorized-Spatial-Embeddings)
 
@@ -363,7 +361,7 @@ $$\mathcal L_{div}^{'} (\pmb x) = \sum_u (\sum_{r=1}^K p(u \vert \pmb x, r) - ma
 对于一张图片$$\pmb x$$和用thin-plate splines（薄板样条插值）TPS实现的transformation $$g_1, g_2$$，网络的输入图片对为：$$g_1 \circ \pmb x$$和$$g_2 \circ (g_1 \circ \pmb x)$$。
 
 
-### \[$$\pmb{CVPR \  2018}$$\] [Unsupervised Discovery of Object Landmarks as Structural Representataions](https://openaccess.thecvf.com/content_cvpr_2018/papers/Zhang_Unsupervised_Discovery_of_CVPR_2018_paper.pdf)
+### \[**CVPR 2018**\] [Unsupervised Discovery of Object Landmarks as Structural Representataions](https://openaccess.thecvf.com/content_cvpr_2018/papers/Zhang_Unsupervised_Discovery_of_CVPR_2018_paper.pdf)
 
 *Yuting Zhang, Yijie Guo, Yinxin Jin, Yijun Luo, Zhiyuan He, Honglak Lee*
 
@@ -494,7 +492,7 @@ $$L_{AE} = \lambda_{recon} L_{recon} + \lambda_{conc} L_{conc} + \lambda_{sep} L
 
 
 
-### \[$$\pmb{NeurIPS \  2020 \  \& \  TPAMI \  2021}$$\] [Unsupervised Learning of Object Landmarks via Self-Training Correspondence](https://proceedings.neurips.cc/paper/2020/hash/32508f53f24c46f685870a075eaaa29c-Abstract.html)
+### \[**NeurIPS 2020** $$\&$$ **TPAMI 2021**\] [Unsupervised Learning of Object Landmarks via Self-Training Correspondence](https://proceedings.neurips.cc/paper/2020/hash/32508f53f24c46f685870a075eaaa29c-Abstract.html)
 
 [CODE-V1](https://github.com/malldimi1/UnsupervisedLandmarks)
 [CODE-V2](https://github.com/malldimi1/KeypointsToLandmarks)
@@ -597,7 +595,7 @@ $$\mathcal{L_f}(x_i^j, x_{i^{'}}^{j^{'}}) = 1_{\left[ y_i^j = y_{i^{'}}^{j^{'}} 
 为了最终将训练集变为只有$$K$$个clusters，作者再次使用了具有$$K$$个聚类中心的K-means。再之后，因为
 
 
-### \[$$\pmb{NeurIPS \  2022 \  Spotlight}$$\] [AutoLink: Self-supervised Learning of Human Skeletons and Object Outlines by Linking Keypoints](https://arxiv.org/pdf/2205.10636.pdf)
+### \[**NeurIPS 2022 Spotlight**\] [AutoLink: Self-supervised Learning of Human Skeletons and Object Outlines by Linking Keypoints](https://arxiv.org/pdf/2205.10636.pdf)
 
 [CODE](https://github.com/xingzhehe/AutoLink-Self-supervised-Learning-of-Human-Skeletons-and-Object-Outlines-by-Linking-Keypoints)
 
@@ -613,158 +611,106 @@ $$\mathcal{L_f}(x_i^j, x_{i^{'}}^{j^{'}}) = 1_{\left[ y_i^j = y_{i^{'}}^{j^{'}} 
 
 有个要注意的技术细节是，reconstruction loss不仅仅是reconstructed的图片和原图片之间的mse loss，而是perception loss，也就是将这两个图片都输入某个预训练好的网络，比如在ImageNet上预训练好的VGG19，然后对比很多层的输出之间的差异的和。这样做要比仅仅在像素层面比较区别更加鲁棒。
 
-### \[$$\pmb{NeurIPS \  2018}$$\] [Unsupervised Learning of Object Landmarks through Conditional Image Generation](https://proceedings.neurips.cc/paper/2018/hash/1f36c15d6a3d18d52e8d493bc8187cb9-Abstract.html)
+### \[**NeurIPS 2018**\] [Unsupervised Learning of Object Landmarks through Conditional Image Generation](https://proceedings.neurips.cc/paper/2018/hash/1f36c15d6a3d18d52e8d493bc8187cb9-Abstract.html)
 
   
-### \[$$\pmb{NeurIPS \  2019}$$\] [Unsupervised Learning of Object Keypoints for Perception and Control](https://proceedings.neurips.cc/paper/2019/hash/dae3312c4c6c7000a37ecfb7b0aeb0e4-Abstract.html)
+### \[**NeurIPS 2019**\] [Unsupervised Learning of Object Keypoints for Perception and Control](https://proceedings.neurips.cc/paper/2019/hash/dae3312c4c6c7000a37ecfb7b0aeb0e4-Abstract.html)
 
 
-### \[$$\pmb{NeurIPS \  2019}$$\] [Object landmark discovery through unsupervised adaptation](https://proceedings.neurips.cc/paper_files/paper/2019/file/97c99dd2a042908aabc0bafc64ddc028-Paper.pdf)
+### \[**NeurIPS 2019**\] [Object landmark discovery through unsupervised adaptation](https://proceedings.neurips.cc/paper_files/paper/2019/file/97c99dd2a042908aabc0bafc64ddc028-Paper.pdf)
 
 
-### \[$$\pmb{WACV \  2022}$$\] [LEAD: Self-Supervised Landmark Estimation by Aligning Distributions of Feature Similarity](https://openaccess.thecvf.com/content/WACV2022/html/Karmali_LEAD_Self-Supervised_Landmark_Estimation_by_Aligning_Distributions_of_Feature_Similarity_WACV_2022_paper.html)
+### \[**WACV 2022**\] [LEAD: Self-Supervised Landmark Estimation by Aligning Distributions of Feature Similarity](https://openaccess.thecvf.com/content/WACV2022/html/Karmali_LEAD_Self-Supervised_Landmark_Estimation_by_Aligning_Distributions_of_Feature_Similarity_WACV_2022_paper.html)
 
 
-### 10. [Unsupervised discovery of object landmarks as structural representation](https://openaccess.thecvf.com/content_cvpr_2018/papers/Zhang_Unsupervised_Discovery_of_CVPR_2018_paper.pdf)
-
-*CVPR 2018*
+### \[**CVPR 2018**\] [Unsupervised discovery of object landmarks as structural representation](https://openaccess.thecvf.com/content_cvpr_2018/papers/Zhang_Unsupervised_Discovery_of_CVPR_2018_paper.pdf)
 
 [POST](https://www.ytzhang.net/projects/lmdis-rep/)
 
 
-### [Unsupervised Learning of Object Landmarks through Conditional Image Generation](https://proceedings.neurips.cc/paper/2018/hash/1f36c15d6a3d18d52e8d493bc8187cb9-Abstract.html)
-
-*NeurIPS 2018*
+### \[**NeurIPS 2018**\] [Unsupervised Learning of Object Landmarks through Conditional Image Generation](https://proceedings.neurips.cc/paper/2018/hash/1f36c15d6a3d18d52e8d493bc8187cb9-Abstract.html)
 
 
-### [Unsupervised Learning of Object Keypoints for Perception and Control](https://proceedings.neurips.cc/paper/2019/hash/dae3312c4c6c7000a37ecfb7b0aeb0e4-Abstract.html)
-
-*NeurIPS 2019*
+### \[**NeurIPS 2019**\] [Unsupervised Learning of Object Keypoints for Perception and Control](https://proceedings.neurips.cc/paper/2019/hash/dae3312c4c6c7000a37ecfb7b0aeb0e4-Abstract.html)
 
 
-### [Unsupervised Learning of Landmarks by Descriptor Vector Exchange](https://openaccess.thecvf.com/content_ICCV_2019/html/Thewlis_Unsupervised_Learning_of_Landmarks_by_Descriptor_Vector_Exchange_ICCV_2019_paper.html)
-
-*ICCV 2019*
+### \[**ICCV 2019**\] [Unsupervised Learning of Landmarks by Descriptor Vector Exchange](https://openaccess.thecvf.com/content_ICCV_2019/html/Thewlis_Unsupervised_Learning_of_Landmarks_by_Descriptor_Vector_Exchange_ICCV_2019_paper.html)
 
 
-### [Self-Supervised Learning of Interpretable Keypoints From Unlabelled Videos](https://openaccess.thecvf.com/content_CVPR_2020/html/Jakab_Self-Supervised_Learning_of_Interpretable_Keypoints_From_Unlabelled_Videos_CVPR_2020_paper.html)
-
-*CVPR 2020*
+### \[**CVPR 2020**\] [Self-Supervised Learning of Interpretable Keypoints From Unlabelled Videos](https://openaccess.thecvf.com/content_CVPR_2020/html/Jakab_Self-Supervised_Learning_of_Interpretable_Keypoints_From_Unlabelled_Videos_CVPR_2020_paper.html)
 
 
-### [Unsupervised Keypoint Learning for Guiding Class-Conditional Video Prediction](https://proceedings.neurips.cc/paper/2019/hash/801272ee79cfde7fa5960571fee36b9b-Abstract.html)
-
-*NeurIPS 2019*
+### \[**NeurIPS 2019**\] [Unsupervised Keypoint Learning for Guiding Class-Conditional Video Prediction](https://proceedings.neurips.cc/paper/2019/hash/801272ee79cfde7fa5960571fee36b9b-Abstract.html)
 
 
-### [Unsupervised Learning of Intrinsic Structural Representation Points](https://openaccess.thecvf.com/content_CVPR_2020/html/Chen_Unsupervised_Learning_of_Intrinsic_Structural_Representation_Points_CVPR_2020_paper.html)
-
-*CVPR 2020*
+### \[**CVPR 2020**\] [Unsupervised Learning of Intrinsic Structural Representation Points](https://openaccess.thecvf.com/content_CVPR_2020/html/Chen_Unsupervised_Learning_of_Intrinsic_Structural_Representation_Points_CVPR_2020_paper.html)
 
 
-### [Unsupervised Human Pose Estimation Through Transforming Shape Templates](https://openaccess.thecvf.com/content/CVPR2021/html/Schmidtke_Unsupervised_Human_Pose_Estimation_Through_Transforming_Shape_Templates_CVPR_2021_paper.html)
-
-*CVPR 2021*
+### \[**CVPR 2021**\] [Unsupervised Human Pose Estimation Through Transforming Shape Templates](https://openaccess.thecvf.com/content/CVPR2021/html/Schmidtke_Unsupervised_Human_Pose_Estimation_Through_Transforming_Shape_Templates_CVPR_2021_paper.html)
 
 [POST](https://infantmotion.github.io)
 
 
-
-### [Object landmark discovery through unsupervised adaptation](https://proceedings.neurips.cc/paper/2019/hash/97c99dd2a042908aabc0bafc64ddc028-Abstract.html)
-
-*NeurIPS 2019*
+### \[**NeurIPS 2019**\] [Object landmark discovery through unsupervised adaptation](https://proceedings.neurips.cc/paper/2019/hash/97c99dd2a042908aabc0bafc64ddc028-Abstract.html)
 
 
-### [Unsupervised Object Keypoint Learning using Local Spatial Predictability](https://openreview.net/forum?id=GJwMHetHc73)
-
-*ICLR 2021*
+### \[**ICLR 2021**\] [Unsupervised Object Keypoint Learning using Local Spatial Predictability](https://openreview.net/forum?id=GJwMHetHc73)
 
 
-### [Semi-supervised Keypoint Localization](https://openreview.net/forum?id=yFJ67zTeI2)
-
-*ICLR 2021*
+### \[**ICLR 2021**\] [Semi-supervised Keypoint Localization](https://openreview.net/forum?id=yFJ67zTeI2)
 
 
-### [Self-Supervised Keypoint Discovery in Behavioral Videos](https://openaccess.thecvf.com/content/CVPR2022/papers/Sun_Self-Supervised_Keypoint_Discovery_in_Behavioral_Videos_CVPR_2022_paper.pdf)
-
-*CVPR 2022*
+### \[**CVPR 2022**\] [Self-Supervised Keypoint Discovery in Behavioral Videos](https://openaccess.thecvf.com/content/CVPR2022/papers/Sun_Self-Supervised_Keypoint_Discovery_in_Behavioral_Videos_CVPR_2022_paper.pdf)
 
 
-### [Weakly Supervised Keypoint Discovery](https://arxiv.org/pdf/2109.13423.pdf)
-
-*Arxiv 2021*
+### \[**Arxiv 2021**\] [Weakly Supervised Keypoint Discovery](https://arxiv.org/pdf/2109.13423.pdf)
 
 
-### [Pretrained equivariant features improve unsupervised landmark discovery](https://arxiv.org/pdf/2104.02925.pdf)
-
-*Arxiv 2021*
+### \[**Arxiv 2021**\] [Pretrained equivariant features improve unsupervised landmark discovery](https://arxiv.org/pdf/2104.02925.pdf)
 
 
-### [Learning Landmarks from Unaligned Data using Image Translation](https://openreview.net/pdf?id=xz3XULBWFE)
-
-*Arxiv 2019*
+### \[**Arxiv 2019**\] [Learning Landmarks from Unaligned Data using Image Translation](https://openreview.net/pdf?id=xz3XULBWFE)
 
 
-### [Self-supervised Learning of Interpretable Keypoints from Unlabelled Videos](https://www.robots.ox.ac.uk/~vgg/research/unsupervised_pose/data/unsupervised_pose.pdf)
-
-*CVPR Oral*
+### \[**CVPR 2021 Oral**\] [Self-supervised Learning of Interpretable Keypoints from Unlabelled Videos](https://www.robots.ox.ac.uk/~vgg/research/unsupervised_pose/data/unsupervised_pose.pdf)
 
 [POST](https://www.robots.ox.ac.uk/~vgg/research/unsupervised_pose/)
 
 
-### [LEAD: Self-Supervised Landmark Estimation by Aligning Distributions of Feature Similarity](https://openaccess.thecvf.com/content/WACV2022/html/Karmali_LEAD_Self-Supervised_Landmark_Estimation_by_Aligning_Distributions_of_Feature_Similarity_WACV_2022_paper.html)
-
-*WACV 2022*
+### \[**WACV 2022**\] [LEAD: Self-Supervised Landmark Estimation by Aligning Distributions of Feature Similarity](https://openaccess.thecvf.com/content/WACV2022/html/Karmali_LEAD_Self-Supervised_Landmark_Estimation_by_Aligning_Distributions_of_Feature_Similarity_WACV_2022_paper.html)
 
 
-### [Unsupervised Learning of Facial Landmarks based on Inter-Intra Subject Consistencies](https://arxiv.org/pdf/2004.07936.pdf)
-
-*Arxiv 2020*
+### \[**Arxiv 2020**\] [Unsupervised Learning of Facial Landmarks based on Inter-Intra Subject Consistencies](https://arxiv.org/pdf/2004.07936.pdf)
 
 
-### [Unsupervised Landmark Learning from Unpaired Data](https://arxiv.org/pdf/2007.01053.pdf)
-
-*Arxiv 2020*
+### \[**Arxiv 2020**\] [Unsupervised Landmark Learning from Unpaired Data](https://arxiv.org/pdf/2007.01053.pdf)
 
 [CODE](https://github.com/justimyhxu/ULTRA)
 
 
-### [LatentKeypointGAN: Controlling GANs via Latent Keypoints](https://xingzhehe.github.io/LatentKeypointGAN/)
-
-*Arxiv 2021*
+### \[**Arxiv 2021**\] [LatentKeypointGAN: Controlling GANs via Latent Keypoints](https://xingzhehe.github.io/LatentKeypointGAN/)
 
 
-### [Unsupervised Part Discovery from Contrastive Reconstruction](https://proceedings.neurips.cc/paper/2021/hash/ec8ce6abb3e952a85b8551ba726a1227-Abstract.html)
-
-*NeurIPS 2021*
+### \[**NeurIPS 2021**\] [Unsupervised Part Discovery from Contrastive Reconstruction](https://proceedings.neurips.cc/paper/2021/hash/ec8ce6abb3e952a85b8551ba726a1227-Abstract.html)
 
 
-### [Video Interpolation and Prediction with Unsupervised Landmarks](https://arxiv.org/pdf/1909.02749.pdf)
-
-*Arxiv 2019*
+### \[**Arxiv 2019**\] [Video Interpolation and Prediction with Unsupervised Landmarks](https://arxiv.org/pdf/1909.02749.pdf)
 
 
-### [Few-shot Keypoint Detection with Uncertainty Learning for Unseen Species](https://openaccess.thecvf.com/content/CVPR2022/papers/Lu_Few-Shot_Keypoint_Detection_With_Uncertainty_Learning_for_Unseen_Species_CVPR_2022_paper.pdf)
-
-*CVPR 2022*
+### \[**CVPR 2022**\] [Few-shot Keypoint Detection with Uncertainty Learning for Unseen Species](https://openaccess.thecvf.com/content/CVPR2022/papers/Lu_Few-Shot_Keypoint_Detection_With_Uncertainty_Learning_for_Unseen_Species_CVPR_2022_paper.pdf)
 
 
-### [TACK: Few-Shot Keypoint Detection as Task Adaptation via Latent Embeddings](https://sites.google.com/view/2021-tack)
-
-*Arxiv 2021*
+### \[**Arxiv 2021**\] [TACK: Few-Shot Keypoint Detection as Task Adaptation via Latent Embeddings](https://sites.google.com/view/2021-tack)
 
 
 
-## 3D keypoints from images
+## 3D keypoints from images (Unsupervised)
 
-### Unsupervised
-
-### 1. [Unsupervised Learning of Visual 3D Keypoints for Control](http://proceedings.mlr.press/v139/chen21b/chen21b.pdf)
-[Code](https://github.com/buoyancy99/unsup-3d-keypoints) [Post](https://buoyancy99.github.io/unsup-3d-keypoints/)
+### [Unsupervised Learning of Visual 3D Keypoints for Control](http://proceedings.mlr.press/v139/chen21b/chen21b.pdf)
 
 *Boyuan Chen, Pieter Abbeel, Deepak Pathak*
 
-*ICML 2021*
+[Code](https://github.com/buoyancy99/unsup-3d-keypoints) [Post](https://buoyancy99.github.io/unsup-3d-keypoints/)
 
 这篇文章使用了一种非监督的方式，设计了一个end-to-end的模型，直接从2D图片里学习到3D keypoints。其是通过一个multi-view consistency约束以及一个下游任务来训练网络的。
 
