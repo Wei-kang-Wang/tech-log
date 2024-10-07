@@ -917,10 +917,6 @@ where $$I_v^k$$ is the inlier set, with $$X_f^k \in R^3$$ the 3D triangulated ke
 *CVPR 2019*
 
 
-### 12. [Unsupervised Learning of Probably Symmetric Deformable 3D Objects From Images in the Wild](https://openaccess.thecvf.com/content_CVPR_2020/html/Wu_Unsupervised_Learning_of_Probably_Symmetric_Deformable_3D_Objects_From_Images_CVPR_2020_paper.html)
-
-*CVPR 2020*
-
 ### 13. [Weakly-Supervised Discovery of Geometry-Aware Representation for 3D Human Pose Estimation](https://openaccess.thecvf.com/content_CVPR_2019/html/Chen_Weakly-Supervised_Discovery_of_Geometry-Aware_Representation_for_3D_Human_Pose_Estimation_CVPR_2019_paper.html)
 
 *CVPR 2019*
@@ -1012,11 +1008,6 @@ $$ min_{\theta} \Sigma_i \mathcal L(\pmb Y_i \ast \zeta_{z_i}^T, \Pi \pmb R_i(\p
 ### 17. [Weakly-Supervised Discovery of Geometry-Aware Representation for 3D Human Pose Estimation](https://openaccess.thecvf.com/content_CVPR_2019/html/Chen_Weakly-Supervised_Discovery_of_Geometry-Aware_Representation_for_3D_Human_Pose_Estimation_CVPR_2019_paper.html)
 
 *CVPR 2019*
-
-
-### 18. [Watch It Move: Unsupervised Discovery of 3D Joints for Re-Posing of Articulated Objects](https://openaccess.thecvf.com/content/CVPR2022/html/Noguchi_Watch_It_Move_Unsupervised_Discovery_of_3D_Joints_for_Re-Posing_CVPR_2022_paper.html)
-
-*CVPR 2022*
 
 
 ### 19. [Unsupervised Temporal Learning on Monocular Videos for 3D Human Pose Estimation](https://arxiv.org/pdf/2012.01511.pdf)
