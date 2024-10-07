@@ -720,7 +720,7 @@ $$\mathcal{L_f}(x_i^j, x_{i^{'}}^{j^{'}}) = 1_{\left[ y_i^j = y_{i^{'}}^{j^{'}} 
 所以本文的想法是，对于预训练好的StableDiffusion，optimize若干个text embedding，使得每个text embedding和image embedding计算完相似度之后（这个相似度matrix就可以理解成一个heatmap），该heatmap是单峰的，这也就意味着该text embedding对应着所有图片的某一固定区域（比如眼睛），如下图所示：
 
 ![unsuper1]({{ '/assets/images/diffusion2dkp1.png' | relative_url }})
-{: style="width: 800px; max-width: 100%;"}
+{: style="width: 800px; max-width: 100%;", class="center"}
 
 具体来说，假设transformer有$$L$$层，每一层有$$C$$个head，那么每一层就可以得到$$C$$个pixel-level的image embedding：$$F_{I}^c \in \mathbb{R}^{H \times W \times D}$$，其中$$c=1,2,\cdots,C$$，$$H,W$$是图片尺寸，$$D$$是特征维度。对于text-embedding来说，假设有$$N$$个token，这样所有的token的embedding集合是$$F_{T} \in \mathbb{R}^{N \times D}$$。从而就可以计算pixel-level的text和image pixel的相似度：$$M_c \mathbb{R}_{+}^{H \times W \times N}$$。最后的相似度矩阵$$M$$是先将$$M_c$$沿着$$N$$维度作softmax，再对于所有的head进行一个average，最后再在$$L$$层上选出几层出来average。
 
@@ -734,12 +734,12 @@ $$\mathcal{L_f}(x_i^j, x_{i^{'}}^{j^{'}}) = 1_{\left[ y_i^j = y_{i^{'}}^{j^{'}} 
 和autolink相比，本文的方法对于pose比较大的情况，确实能够正确识别，比如下图：
 
 ![unsuper1]({{ '/assets/images/diffusion2dkp2.png' | relative_url }})
-{: style="width: 800px; max-width: 100%;"}
+{: style="width: 800px; max-width: 100%;", class="center"}
 
 但是对于某些情况，比如说人体，该方法仍然不能正确的区分正反面（可能是因为人脸这种用于区分正反面的特征在图片里的区域太小了，导致特征信息不够）：
 
 ![unsuper1]({{ '/assets/images/diffusion2dkp3.png' | relative_url }})
-{: style="width: 800px; max-width: 100%;"}
+{: style="width: 800px; max-width: 100%;", class="center"}
 
 
 ## 3D keypoints from images (supervised)
