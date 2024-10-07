@@ -79,7 +79,9 @@ tags: paper-reading
 
 ## \[**CVPR 2021**\] [PAUL: Procrustean Autoencoder for Unsupervised Lifting](https://openaccess.thecvf.com/content/CVPR2021/papers/Wang_PAUL_Procrustean_Autoencoder_for_Unsupervised_Lifting_CVPR_2021_paper.pdf)
 
+## \[**WACV 2024**\] [Unsupervised 3D Pose Estimation with Non-Rigid Structure-from-Motion Modeling](https://openaccess.thecvf.com/content/WACV2024/papers/Ji_Unsupervised_3D_Pose_Estimation_With_Non-Rigid_Structure-From-Motion_Modeling_WACV_2024_paper.pdf)
 
+## \[**CVPR 2024**\] [Non-rigid Structure-from-Motion: Temporally-smooth Procrustean Alignment and Spatially-variant Deformation Modeling](https://npucvr.github.io/TSM-NRSfM/)
 
 
 
