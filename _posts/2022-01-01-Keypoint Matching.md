@@ -1,4 +1,19 @@
-## Keypoint matching
+---
+layout: post
+comments: false
+title: "Keypoint Matching"
+date: 2020-01-01 01:09:00
+tags: paper-reading
+---
+
+<!--more-->
+
+{: class="table-of-content"}
+* TOC
+{:toc}
+
+---
+
 
 ### 1. [Multi-Image Semantic Matching by Mining Consistent Features](https://openaccess.thecvf.com/content_cvpr_2018/papers/Wang_Multi-Image_Semantic_Matching_CVPR_2018_paper.pdf)
 
