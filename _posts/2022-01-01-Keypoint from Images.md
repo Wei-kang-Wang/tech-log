@@ -17,7 +17,7 @@ tags: paper-reading
 
 ## 2D keypoints from images (supervised)
 
-### \[\bf{ECCV \  2016}\] [Stacked hourglass networks for human pose estimation](https://arxiv.org/pdf/1603.06937.pdf)
+### \[**ECCV 2016}**\] [Stacked hourglass networks for human pose estimation](https://arxiv.org/pdf/1603.06937.pdf)
 
 *Alejandro Newell, Kaiyu Yang, Jia Deng*
 
@@ -66,7 +66,7 @@ hourglass网络的设置如下：卷积层和max pooling层将输入图片的分
 本文详细阐述了使用hourglass模块构造成的网络对于human pose estimation任务的效果。intermediate supervision对于好的效果来说是很必要的。虽然说还有一些问题没有解决，但是本文提出的方法对于绝大多数情况下的human pose estimation的效果还是很好的。
 
 
-### \[$$\pmb{CVPR \  2017 \ \& \  TPAMI \  2019}$$\] [OpenPose: Realtime Multi-Person 2D Pose Estimation Using Part Affinity Fields](https://arxiv.org/pdf/1812.08008.pdf)
+### \[**{CVPR 2017** $$\&$$  **TPAMI 2019**\] [OpenPose: Realtime Multi-Person 2D Pose Estimation Using Part Affinity Fields](https://arxiv.org/pdf/1812.08008.pdf)
 *Zhe Cao, Gines Hidalgo, Tomas Simon, Shih-En Wei, and Yaser Sheikh*
 
 
