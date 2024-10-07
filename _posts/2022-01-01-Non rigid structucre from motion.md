@@ -42,9 +42,10 @@ tags: paper-reading
 
 流程图如下：
 
-<div align=center>![C3DPO-1]({{ '/assets/images/C3DPO-1.png' | relative_url }})
+<div align=center>
+![C3DPO-1]({{ '/assets/images/C3DPO-1.png' | relative_url }})
 {: style="width: 800px; max-width: 100%;"}
-
+</div>
 
 > 注意，网络并不是直接输出的rotation matrix，而是输出了一个长度为3的向量，然后经过hat operator和matrix exponential计算，得到了rotation matrix。参考[hat operator](https://en.wikipedia.org/wiki/Hat_operator)，[matrix exponential](https://en.wikipedia.org/wiki/Matrix_exponential)
 
