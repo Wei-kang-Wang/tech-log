@@ -716,8 +716,14 @@ $$\mathcal{L_f}(x_i^j, x_{i^{'}}^{j^{'}}) = 1_{\left[ y_i^j = y_{i^{'}}^{j^{'}} 
 [CODE](Unsupervised Keypoints from Pretrained Diffusion Models)
 
 
+## 3D keypoints from images (supervised)
 
-## 3D keypoints from images (Unsupervised)
+### \[**NeurIPS 2018 Oral**\] [Occlusion-Net: 2D/3D Occluded Keypoint Localization Using Graph Networks](https://openaccess.thecvf.com/content_CVPR_2019/papers/Reddy_Occlusion-Net_2D3D_Occluded_Keypoint_Localization_Using_Graph_Networks_CVPR_2019_paper.pdf)
+
+[CODE](https://github.com/dineshreddy91/Occlusion_Net)
+
+
+## 3D keypoints from images (unsupervised)
 
 
 ### \[**NeurIPS 2018 Oral**\] [Discovery of Latent 3D Keypoints via End-to-end Geometric Reasoning](https://keypointnet.github.io/keypointnet_neurips.pdf)
