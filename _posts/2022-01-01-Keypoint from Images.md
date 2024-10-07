@@ -715,6 +715,32 @@ $$\mathcal{L_f}(x_i^j, x_{i^{'}}^{j^{'}}) = 1_{\left[ y_i^j = y_{i^{'}}^{j^{'}} 
 
 [CODE](Unsupervised Keypoints from Pretrained Diffusion Models)
 
+这篇文章和[]()一样，基于的想法是，对于训练好的text-based StableDiffusion模型，即使是random的text embedding，和multi-head encoder得到的image embedding计算相似度再可视化，都能看到图中object大致的形状，并且相似度高的区域具有一定的semantics。
+
+所以本文的想法是，对于预训练好的StableDiffusion，optimize若干个text embedding，使得每个text embedding和image embedding计算完相似度之后（这个相似度matrix就可以理解成一个heatmap），该heatmap是单峰的，这也就意味着该text embedding对应着所有图片的某一固定区域（比如眼睛），如下图所示：
+
+![unsuper1]({{ '/assets/images/diffusion2dkp1.png' | relative_url }})
+{: style="width: 800px; max-width: 100%;"}
+
+具体来说，假设transformer有$$L$$层，每一层有$$C$$个head，那么每一层就可以得到$$C$$个pixel-level的image embedding：$$F_{I}^c \in \mathbb{R}^{H \times W \times D}$$，其中$$c=1,2,\cdots,C$$，$$H,W$$是图片尺寸，$$D$$是特征维度。对于text-embedding来说，假设有$$N$$个token，这样所有的token的embedding集合是$$F_{T} \in \mathbb{R}^{N \times D}$$。从而就可以计算pixel-level的text和image pixel的相似度：$$M_c \mathbb{R}_{+}^{H \times W \times N}$$。最后的相似度矩阵$$M$$是先将$$M_c$$沿着$$N$$维度作softmax，再对于所有的head进行一个average，最后再在$$L$$层上选出几层出来average。
+
+在得到了相似度矩阵$$M \mathbb{R}_{+}^{H \times W \times N}$$之后，其loss是对于每一个$$M_i \mathbb{R}_{+}^{H \times W \times N}$$，$$i=1,2,\cdots,N$$，先找到该$$M_i$$最大值所在的坐标，以该坐标为中心，在$$H \times W$$的2维grid上构建一个高斯分布（方差是超参数），然后计算$$M_i$$与该高斯分布之间的损失。
+
+有几点值得注意的技术细节：
+* 首先，在训练的时候，除了上述的损失函数，还需要加一个transformation损失，也就是对于手动transform之后的输入图片，其得到的相似矩阵，也应该加上同样的transformation（也就是之前那些unsupervised keypoint inference方法里的equivariance loss）
+* 其次，因为keypoints存在遮挡的情况，所以对于某些图片来说，可能计算出来的相似矩阵是比较弥散的（即不能对应一个尖峰高斯，因为其本来就检测不到）。为了解决这个问题，作者提出的engineering的方法是先设定一个较大的keypoint值，比如说50，最后选择那些和高斯分布的KL散度最小的相似矩阵对应的那些keypoint作为输出，比如说25。
+* 最后，为了实现所得到的keypoints确实能够覆盖object，作者还在上一步所得到的那些keypoint里，继续使用fartest point sampling选择出一个subset作为最终的输出，比如说15。
+
+和autolink相比，本文的方法对于pose比较大的情况，确实能够正确识别，比如下图：
+
+![unsuper1]({{ '/assets/images/diffusion2dkp2.png' | relative_url }})
+{: style="width: 800px; max-width: 100%;"}
+
+但是对于某些情况，比如说人体，该方法仍然不能正确的区分正反面（可能是因为人脸这种用于区分正反面的特征在图片里的区域太小了，导致特征信息不够）：
+
+![unsuper1]({{ '/assets/images/diffusion2dkp3.png' | relative_url }})
+{: style="width: 800px; max-width: 100%;"}
+
 
 ## 3D keypoints from images (supervised)
 
