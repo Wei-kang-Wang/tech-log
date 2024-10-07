@@ -491,6 +491,8 @@ fig1里的最右边的灰色线表示了这个过程。
 $$L_{AE} = \lambda_{recon} L_{recon} + \lambda_{conc} L_{conc} + \lambda_{sep} L_{sep} + \lambda_{eqv} L_{eqv} \tag{15}$$
 
 
+### \[**3DV 2019**\] [Structured Domain Adaptation for 3D Keypoint Estimation](https://ieeexplore.ieee.org/abstract/document/8885979)
+
 
 ### \[**NeurIPS 2020** $$\&$$ **TPAMI 2021**\] [Unsupervised Learning of Object Landmarks via Self-Training Correspondence](https://proceedings.neurips.cc/paper/2020/hash/32508f53f24c46f685870a075eaaa29c-Abstract.html)
 
