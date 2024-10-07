@@ -42,7 +42,7 @@ tags: paper-reading
 
 流程图如下：
 
-![C3DPO-1]({{ '/assets/images/C3DPO-1.png' | relative_url }})
+<div align=center>![C3DPO-1]({{ '/assets/images/C3DPO-1.png' | relative_url }})
 {: style="width: 800px; max-width: 100%;"}
 
 
@@ -52,6 +52,8 @@ tags: paper-reading
 
 ## \[**ICCV 2019**\] [Deep Non-Rigid Structure from Motion](https://openaccess.thecvf.com/content_ICCV_2019/papers/Kong_Deep_Non-Rigid_Structure_From_Motion_ICCV_2019_paper.pdf)
 
+
+## \[**3DV 2020**\] [Deep NRSfM++: Towards Unsupervised 2D-3D Lifting in the Wild](https://arxiv.org/pdf/2001.10090)
 
 
 ## \[**ECCV 2020**\] [Procrustean Regression Networks: Learning 3D Structure of Non-Rigid Objects from 2D Annotations](https://arxiv.org/pdf/2007.10961.pdf)
@@ -73,6 +75,11 @@ tags: paper-reading
 * 对于任意一个3D shape $$X_i \in \mathbb{R}^{3 \times n_p}$$，和reference shape，$$\bar{X}$$，aligned所使用的rotation matrix是这样计算得来的：$$R_i = \mathop{argmin}\limits_{R} \lVert RX_iT - \bar{X} \rVert$$，其中$$R_i^T R = I$$，$$T = I_{n_p} - \frac{1}{n_p} 1_{n_p} 1_{n_p}^T$$是translation matrix，用于将shape $$X_i$$center到origin上。这里的$$T$$的用法可以被借鉴。而aligned的shape就是$$\tilde{X_i} = R_i X_i T$$。
 * PRN和PR这两篇文章都花了大量的篇幅证明上述网络设计的每个部分都是differentiable的（计算出来了loss对于$$X_i$$和reference shape $$\bar{X}$$的导数），所以说GPA也可以被放在可学习的框架内。
 * PRN相对于C3DPO还有个创新就是，其的输入既可以是和C3DPO一样，是2D keypoint matrix，也可以是RGB图片，分别使用MLP和CNN来作为网络框架。
+
+
+## \[**CVPR 2021**\] [PAUL: Procrustean Autoencoder for Unsupervised Lifting](https://openaccess.thecvf.com/content/CVPR2021/papers/Wang_PAUL_Procrustean_Autoencoder_for_Unsupervised_Lifting_CVPR_2021_paper.pdf)
+
+
 
 
 
