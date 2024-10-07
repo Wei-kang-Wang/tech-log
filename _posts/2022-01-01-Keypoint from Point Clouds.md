@@ -1,4 +1,21 @@
-## 3D keypoints from point clouds
+---
+layout: post
+comments: false
+title: "Keypoint from Point Clouds"
+date: 2020-01-01 01:09:00
+tags: paper-reading
+---
+
+<!--more-->
+
+{: class="table-of-content"}
+* TOC
+{:toc}
+
+---
+
+
+## Unsupervised Methods
 
 ### 1. [KeypointDeformer: Unsupervised 3D Keypoint Discovery for Shape Control](https://openaccess.thecvf.com/content/CVPR2021/papers/Jakab_KeypointDeformer_Unsupervised_3D_Keypoint_Discovery_for_Shape_Control_CVPR_2021_paper.pdf)
 
