@@ -931,10 +931,6 @@ where $$I_v^k$$ is the inlier set, with $$X_f^k \in R^3$$ the 3D triangulated ke
 *CVPR 2019*
 
 
-### 15. [Watch It Move: Unsupervised Discovery of 3D Joints for Re-Posing of Articulated Objects](https://openaccess.thecvf.com/content/CVPR2022/html/Noguchi_Watch_It_Move_Unsupervised_Discovery_of_3D_Joints_for_Re-Posing_CVPR_2022_paper.html)
-
-*CVPR 2022*
-
 
 ### 16. [End-to-End Learning of Multi-category 3D Pose and Shape Estimation](https://arxiv.org/pdf/2112.10196.pdf)
 
