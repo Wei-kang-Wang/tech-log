@@ -715,7 +715,7 @@ $$\mathcal{L_f}(x_i^j, x_{i^{'}}^{j^{'}}) = 1_{\left[ y_i^j = y_{i^{'}}^{j^{'}} 
 
 [CODE](Unsupervised Keypoints from Pretrained Diffusion Models)
 
-这篇文章和[]()一样，基于的想法是，对于训练好的text-based StableDiffusion模型，即使是random的text embedding，和multi-head encoder得到的image embedding计算相似度再可视化，都能看到图中object大致的形状，并且相似度高的区域具有一定的semantics。
+这篇文章和[Unsupervised Semantic Correspondence Using Stable Diffusion](https://ubc-vision.github.io/LDM_correspondences/)一样，基于的想法是，对于训练好的text-based StableDiffusion模型，即使是random的text embedding，和multi-head encoder得到的image embedding计算相似度再可视化，都能看到图中object大致的形状，并且相似度高的区域具有一定的semantics。
 
 所以本文的想法是，对于预训练好的StableDiffusion，optimize若干个text embedding，使得每个text embedding和image embedding计算完相似度之后（这个相似度matrix就可以理解成一个heatmap），该heatmap是单峰的，这也就意味着该text embedding对应着所有图片的某一固定区域（比如眼睛），如下图所示：
 
