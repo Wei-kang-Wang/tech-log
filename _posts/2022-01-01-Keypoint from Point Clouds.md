@@ -1193,10 +1193,6 @@ $$\begin{equation}
 
 *Arxiv 2019*
 
-### 6. [Structured Domain Adaptation for 3D Keypoint Estimation](https://ieeexplore.ieee.org/abstract/document/8885979)
-
-*3DV 2019*
-
 
 ### 7. [Gen6D: Generalizable Model-Free 6-DoF Object Pose Estimation from RGB Images](https://arxiv.org/pdf/2204.10776.pdf)
 
