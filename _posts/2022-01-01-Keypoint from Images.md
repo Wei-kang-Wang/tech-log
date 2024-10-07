@@ -714,6 +714,184 @@ $$\mathcal{L_f}(x_i^j, x_{i^{'}}^{j^{'}}) = 1_{\left[ y_i^j = y_{i^{'}}^{j^{'}} 
 
 ## 3D keypoints from images (Unsupervised)
 
+
+### \[**NeurIPS 2018 Oral**\] [Discovery of Latent 3D Keypoints via End-to-end Geometric Reasoning](https://keypointnet.github.io/keypointnet_neurips.pdf)
+*Supasorn Suwajanakorn, Noah Snavely, Jonathan Tompson, Mohammad Norouzi*
+
+[Review](https://papers.nips.cc/paper/2018/file/24146db4eb48c718b84cae0a0799dcfc-Reviews.html)
+[CODE](https://github.com/ZhengyiLuo/KeypointNet)
+
+**Abstract**
+
+这篇文章提出了KeypointNet，一个end-to-end的geometric reasoning框架，来学习一批最优的category-specific 3D keypoints。给定一张图片，KeypointNet为下游任务提取最优的3D keypoints。我们在3D pose estimation任务上应用我们的框架，我们提出一个能找到一个object的两个view之间的相对姿态的differentiable的目标函数。我们的模型能在一类有着不同视角和不同instances的object图片种学习到geometrically和semantically都consistent的keypoints。我们发现，我们所提出的这个框架并没有用到任何标注（监督信息），却在pose estimation任务上比使用同样框架的监督方法效果要好。
+
+
+**1. Introduction**
+
+CNN已经说明同时优化feature extraction和classification可以很大程度的改进object recognition任务的效果。而现有的解决geometric vision problems（比如说3D reconstruction，shape alignment等）的方法，包含了两个stage，也就是一个单独的keypoint detection模块，和后来的geometric reasoning操作。在这篇文章里，我们探索是否可以对于geometric vision problem提出一种end-to-end的框架，在其中keypoints作为下游任务的latent variables被优化出来。
+
+考虑确定一张图片里一辆汽车的3D pose这样一个问题。一个标准的做法是先检测一个稀疏的category-specific keypoints的集合，之后再利用这些keypoints使用某种geometric reasoning框架（比如说，PnP algorithm）来重建3D pose或者相机角度。我们可以利用很强的监督信息，对于每个object category，利用很多张标有keypoints位置的该类object的图片，来学习一个针对该类object的keypoint detector。或者使用model-based fitting方法来学习这样的keypoint detector。研究者已经建立了标有keypoints的face，hands，human body的datasets。但是，对于某个object category的图片里的keypoints进行选取和标注的过程是十分复杂而且ill-defined的。为了设计合理的keypoint set，需要将这个keypoint set要用在什么下游任务这个信息考虑进来。直接利用下游任务来优化keypoints的选择会自然的鼓励网络学到对于这个下游任务最有用的那些keypoints。
+
+这篇文章提出了KeypointNet，一个end-to-end的geometric reasoning框架，来对于一个特别的下游任务，学习一个最优的category-specific 3D keypoints。我们的方法相对于先前工作的创新点在于我们利用一个任意的下游任务来将keypoints作为latent variable学习出来。我们的框架对于任何目标函数对于keypoints positions是可微分的下游任务都是可以使用的。我们这篇文章使用的是3D pose estimation作为下游任务，我们的最关键的技术贡献在于：1）一个新的对于keypoint positions可微分的pose estimation目标函数；2）一个multi-view consistent的loss function。这个pose estimation任务的目标函数旨在为恢复同一个object的两个views之间的relative pose任务找到最优的keypoints集合。multi-view consistency loss估计在一个object的3D transformations之间找到consistent的keypoints。值得注意的是，我们是从一些2D图片里检测3D keypoints（2D points加上深度），而且我们的pose estimation和multi-view consistency都是针对3D keypoints detection设计的。
+
+我们的KeypointNet对于一个给定的object类别可以在含有不同角度和不同instances的这个类别的object的一系列图片种学习到geometrically和semantically都consistent的keypoints。某些学习到的keypoints对应到很有意思而且semantically有意义的地方，比如说car的wheels，并且这些keypoints还可以不通过object geometry直接获取3D的信息。我们在ShapeNet dataset上对于不同的object类别做了三个实验。对于3D pose estimation，我们还和有标注的监督方法进行了对比。令人惊讶的是，我们的end-to-end方法在没有keypoints标注的情况下取得了更好的结果。
+
+
+**2. Related Work**
+
+2D和3D的keypoint detection任务都是CV领域的被研究了很久的问题，而keypoint inference在object localization任务上一直被用作一个早期的stage。比如说，使用CNN在monocular RGB图片上检测2D的human joint position的任务。因为在HCI，motion capture和security应用领域都有广泛的需求，有很多工作都在研究keypoint detection和object localization结合的任务：[A coarse-fine network for keypoint localization](https://openaccess.thecvf.com/content_ICCV_2017/papers/Huang_A_Coarse-Fine_Network_ICCV_2017_paper.pdf)，[Stacked Hourglass Networks for Human Pose Estimation](https://arxiv.org/pdf/1603.06937.pdf)，[Towards Accurate Multi-person Pose Estimation in the Wild](https://openaccess.thecvf.com/content_cvpr_2017/papers/Papandreou_Towards_Accurate_Multi-Person_CVPR_2017_paper.pdf)，[DeepCut: Joint Subset Partition and Labeling for Multi Person Pose Estimation](https://www.cv-foundation.org/openaccess/content_cvpr_2016/papers/Pishchulin_DeepCut_Joint_Subset_CVPR_2016_paper.pdf)，[Learning Feature Pyramids for Human Pose Estimation](https://openaccess.thecvf.com/content_ICCV_2017/papers/Yang_Learning_Feature_Pyramids_ICCV_2017_paper.pdf)
+
+和我们这篇论文更加有关系的工作，就是有一批利用CNN从monocular RGB图片中检测3D human keypoint的论文，它们使用了各种各样的CNN结构、各种监督目标函数、以及各种3D structural prior knowledge来学习一批标记好位置的3D joint locations，[Adversarial Learning of Structure-Aware Fully Convolutional Networks for Landmark Localization](https://arxiv.org/pdf/1711.00253.pdf)，[DensePose: Dense Human Pose Estimation In The Wild
+](https://openaccess.thecvf.com/content_cvpr_2018/papers/Guler_DensePose_Dense_Human_CVPR_2018_paper.pdf)，[Monocular 3D Human Pose Estimation In The Wild Using Improved CNN Supervision](https://arxiv.org/pdf/1611.09813.pdf?source=post_page---------------------------)，[Single-Shot Multi-Person 3D Pose Estimation From Monocular RGB](https://arxiv.org/pdf/1712.03453.pdf)，[VNect: Real-time 3D Human Pose Estimation with a Single RGB Camera](https://vcai.mpi-inf.mpg.de/projects/VNect/content/VNect_SIGGRAPH2017.pdf)。还有一些工作利用所学习到的2D keypoint detector结合3D priors来做2D-to-3D-lifting，[3D Human Pose Estimation = 2D Pose Estimation + Matching](https://openaccess.thecvf.com/content_cvpr_2017/papers/Chen_3D_Human_Pose_CVPR_2017_paper.pdf)，[A simple yet effective baseline for 3d human pose estimation](https://openaccess.thecvf.com/content_ICCV_2017/papers/Martinez_A_Simple_yet_ICCV_2017_paper.pdf)，[Sparseness Meets Deepness: 3D Human Pose Estimation from Monocular Video](https://openaccess.thecvf.com/content_cvpr_2016/papers/Zhou_Sparseness_Meets_Deepness_CVPR_2016_paper.pdf)。或者从depth图片里找到data-to-model的对应关系，[Metric Regression Forests for Correspondence Estimation](http://www.cs.toronto.edu/~jtaylor/papers/IJCV2015-MetricRegressionForests.pdf)。[Improving landmark localization with semi-supervised learning](https://openaccess.thecvf.com/content_cvpr_2018/papers/Honari_Improving_Landmark_Localization_CVPR_2018_paper.pdf)通过引入semi-supervised任务比如说attribute prediction或者equivalent landmark prediction来改进landmark prediction。相反的是，我们的keypoints set并不是被定义为了prior，而是作为下游的geometric estimation任务的latent variable被优化出来。[Single Image 3D Interpreter Network](http://people.csail.mit.edu/tfxue/papers/eccv2016_3DINN.pdf)也是相关的文章。
+
+在CNN feature representation中设计latent structure在很多领域都被研究过了。比如说，capsule网络以及它的变种将隐藏层的输出的activation结果的大小和方向结合起来用作构建更高层的features。我们的KeypointNet的输出可以看作一个latent 3D feature，其因为multi-view consistency loss和后续下游任务的relative pose目标函数的原因而倾向于表示的是图片里object的3D keypoint locations。
+
+最近的很多工作研究了同一个类别的object的不同的形状和外表的图片的2D keypoints之间的对应关系。。比如说，[Universal correspondence network](https://proceedings.neurips.cc/paper/2016/file/b495ce63ede0f4efc9eec62cb947c162-Paper.pdf)使用了一个基于appearance的contrastive loss来encode geometry和semantic的相似性。[SCNet: Learning semantic correspondence](https://openaccess.thecvf.com/content_ICCV_2017/papers/Han_SCNet_Learning_Semantic_ICCV_2017_paper.pdf)提出了一个新的SCNet网络用来学习2D keypoints之间的semantic correspondence。[Multi-image semantic matching by mining consistent features](https://openaccess.thecvf.com/content_cvpr_2018/papers/Wang_Multi-Image_Semantic_Matching_CVPR_2018_paper.pdf)通过解决一个feature selection和labeling的问题利用deep features在一系列图片上做一个multi-image matching的任务。[Unsupervised learning of object frames by dense equivariant image labelling](https://arxiv.org/pdf/1706.02932.pdf)使用ground truth transforms（图片对之间的optical flow）和point-wise matching来对于不同角度以及不同appearance的图片之间学习一个dense的以object为中心的coordinate frame。[Learning to see by moving](https://www.cv-foundation.org/openaccess/content_iccv_2015/papers/Agrawal_Learning_to_See_ICCV_2015_paper.pdf)使用图片之间的egomotion prediction以一种自监督的方式来学习feature representations，并且以这种方式所学习到的representations和以监督学习方式得到的representations对很多下游任务来说效果是差不多的。
+
+还有一些工通过不同的监督信号来学习latent 2D或者3D features。[Constructing implicit 3D shape models for pose estimation](http://www.weizmann.ac.il/math/ronen/sites/math.ronen/files/uploads/arie-nachimson_basri_-_constructing_implicit_3d_shape_models_for_pose_estimation.pdf)为rigid objects建立了3D models之后利用这个model来从一张2D图片和一些3D的latent features里估计3D pose。受到cycle-consistency对于学习correspondence的作用的启发，[Learning dense correspondence via 3d-guided cycle consistency](https://openaccess.thecvf.com/content_cvpr_2016/papers/Zhou_Learning_Dense_Correspondence_CVPR_2016_paper.pdf)训练了一个CNN来对同一个类别的object的不同instance的图片之间预测correspondence，数据是由CAD模型提供的。独立于我们的文章，[Unsupervsied discovery of object landmarks as structural representations](https://openaccess.thecvf.com/content_cvpr_2018/papers/Zhang_Unsupervised_Discovery_of_CVPR_2018_paper.pdf)利用一个reconstruction的目标函数来为已知类别的object的图片检测稀疏的2D landmarks，这些2D landmarks显式的作为structure representations被使用。相似的，[Conditional image generation for learning the structure of visual objects]()利用conditional图像生成和一个reconstruction目标函数来学习2D keypoints，这些2D keypoints含有训练图片对之间的geometric变化的信息。[Unsupervised geometry-aware representation for 3d human pose estimation](https://www.ecva.net/papers/eccv_2018/papers_ECCV/papers/Helge_Rhodin_Unsupervised_Geometry-Aware_Representation_ECCV_2018_paper.pdf)使用一个multi-view consistency loss，和我们的相似，来为human pose estimation任务学习3D latent variables。不同于上述提到的最后的四篇文章，我们的latent keypoints是为一个下游任务来优化的，这种方法会产生对于下游任务更有用的keypoints。通过在真实的物理3D结构中表示我们所学到的keypoints，我们发现我们的方法甚至可以发现图片中被遮住部分的keypoints之间的correspondence，而且这些图片里的物体还具有很大的姿态差异，比如说尽心了很大程度的旋转。
+
+寻找3D keypoints之间的correspondence的工作也在持续的开展。[Learning a descriptor-specific 3d keypoint detector](https://openaccess.thecvf.com/content_iccv_2015/papers/Salti_Learning_a_Descriptor-Specific_ICCV_2015_paper.pdf)将3D keypoint detection任务看作一个points之间的binary classification任务，而这些points的ground truth similarity label是由一个预先定义好的3D descriptor提供的。[Unsupervised domain adaptation for 3d keypoint prediction from a single depth scan](https://www.ecva.net/papers/eccv_2018/papers_ECCV/papers/Xingyi_Zhou_Unsupervised_Domain_Adaptation_ECCV_2018_paper.pdf)使用view-consistency作为监督信号来预测3D keypoints，但仅仅是在depth images上使用。相似的，[Render for CNN: Viewpoint estimation in images using CNNs trained with rendered 3D model views](https://www.cv-foundation.org/openaccess/content_iccv_2015/papers/Su_Render_for_CNN_ICCV_2015_paper.pdf)使用synthetically rendered模型来预测object viewpoint，而这是通过使用CNN viewpoint embedding来将其与真实世界里的图片匹配从而实现的。除了keypoints，基于geometric和motion reasoning的自监督方法也被用来预测其它形式的输出，比如说[Self-supervised learning of motion capture](https://proceedings.neurips.cc/paper/2017/file/ab452534c5ce28c4fbb0e102d4a4fb2e-Paper.pdf)里提到的3D shape。
+
+
+**3. End-to-end Optimization of 3D Keypoints**
+
+给定一张含有一个已经知道类别的object的图片，我们的模型可以预测一个3D keypoint的有序的list，定义为pixel coordinates和相对应的depth values。这样的keypoints要求对于这个类别的object的不同instances以及不同角度的图片具有geometrically和semantically consistency，在fig 1能看到。
+
+![RESULT]({{ '/assets/images/DOWNSTREAM-1.PNG' | relative_url }})
+{: style="width: 800px; max-width: 100%;"}
+*Fig 1. KeypointNet在ShapeNet测试集上对于cars，planes和chairs的结果。我们的网络能够泛化到没见过的appearance和shape变化上去，并且还能consistently的预测被遮住的部分比如说wheels和chair legs。*
+
+我们的KeypointNet有N个head从而可以提取N个keypoints，而且它们是有顺序的，同一个head用来提取同一个semantic的keypoint。这些keypoints可以作为基于稀疏点的feature representations的构建模块，对于geometric reasoning和pose-aware，pose-invariant object recognition任务会有用。
+
+和利用监督方法学习一个从图片到list的keypoint positions的映射的方法不同，我们并不将keypoint positions用作一个priori。取而代之的是，我们利用一个下游的任务来联合选取keypoints。我们在训练的时候使用的是relative pose estimation任务，这个任务是给定同一个object的两个views，而且直到这两个views之间的rigid transformation $$T$$，我们要在两个views里预测最优的两个3D keypoints lists，$$P_1$$和$$P_2$$，从而使得一个view能最佳的match另一个view。过程如fig 2所示。
+
+![PIPELINE]({{ '/assets/images/DOWNSTREAM-2.PNG' | relative_url }})
+{: style="width: 800px; max-width: 100%;"}
+*Fig 2. 在训练过程中，同一个object的两个views都会给KeypointNet作为输入。两个views之间的rigid transformation $$(R,t)$$也作为监督信号被提供。我们学习一个3D keypoints的ordered list，在两个views里是consistent的而且能够让我们复原transformation。在inference的时候，KeypointNet从一张单独的输入图片提取3D keypoint positions。*
+
+我们设计了一个目标函数$$O(P_1，P_2)$$，基于此我们可以优化一个从一张图片到一个3D keypoint的ordered list的parametric mapping（也就是我们的KeypointNet）。我们的目标函数有两个主要的组成部分：
+
+* 一个multi-view consistency loss，在知道transformation的情况下用来衡量两个3D keypoint ordered lists之间的差异；
+* 一个relative pose estimation loss，使得用orthogonal procrustes从$$P_1$$和$$P_2$$还原出的rotation $$R^{'}$$和真实的rotation $$R$$相同。
+
+我们认为这两个terms使得模型可以检测重要的keypoints，其中某些是人类会为不同object类别选取的semantically meaningful的locations。注意到我们并没有直接去寻找那些semantically meaningful的keypoins，因为它们可能对于下游的任务来说并不是最好的，而且会很难去挑选。下面我们将会先解释我们的目标函数，之后介绍KeypointNet的结构。
+
+**notation**
+
+每个training tuple有一对图片$$(I,I^{'})$$，其是同一个object的两个不同角度的图片，并且有它们的relative rigid transformation $$T \in SE(3)$$，将潜在的3D shapes从$$I$$变换到了$$I^{'}$$。$$T$$有着以下的matrix form：
+
+![MATRIX]({{ '/assets/images/DOWNSTREAM-3.PNG' | relative_url }})
+{: style="width: 800px; max-width: 100%;"}
+
+其中$$R$$和$$t$$分别代表一个3D rotation和一个3D translation。我们将通过优化一个目标函数$$O(f_{\theta}(I), f_{\theta}(I^{'}))$$，来学习一个函数$$f_{\theta}(I)$$，参数是$$\theta$$，将一个2D的图片$$I$$映射到一个3D keypoint locations的list，$$P=(p_1,p_2,...,p_N)$$，其中$$p_i=(u_i,v_i,z_i)$$。
+
+
+**3.1 Multi-view consistency**
+
+我们的multi-view consistency loss的目的就是确保keypoints能在不同的views里跟踪consistent的部分。两个views里的3D keypoints应该分别在3D空间里对应到object的同一个3D像素点。我们假设已知相机的global focal length $$f$$。下面我们使用$$\left[x,y,z\right]$$代表3D坐标，使用$$\left[u,v\right]$$代表pixel坐标。照片$$I$$的keypoint $$\left[u,v,z\right]$$映射到照片$$I^{'}$$的计算由下面的projection operators给出（从$$I^{'}$$映射到$$I$$也给出）：
+
+$$\left[\hat{u}, \hat{v}, \hat{z}, 1\right]^T  \sim \pi T \pi^{-1}(\left[u,v,z,1\right]^T)$$
+
+$$\left[\hat u^{'}, \hat v^{'}, \hat z^{'}, 1 \right]^T  \sim \pi T^{-1} \pi^{-1}(\left[u^{'},v^{'},z^{'},1 \right]^T)$$
+
+其中，$$\hat{u}$$表示$$u$$映射到第二张图片里的坐标，$$\hat u^{'}$$表示$$u^{'}$$映射到第一张图片里的坐标。$$\pi:R^4 \rightarrow R^4$$表示将一个homogeneous的在camera coordinates下的3D coordinate $$\left[x,y,z,1 \right]^T$$映射到一个pixel position再加上depth的perspective projection操作：
+
+$$\pi(\left[x,y,z,1 \right]^T) = \left[\frac{fx}{z}, \frac{fy}{z}, z, 1 \right] = \left[u,v,z,1 \right]^T$$
+
+我们定义一个symmetric multi-view consistency loss如下：
+
+$$L_{con} = \frac{1}{2N}\Sigma_{i=1}^N ||\left[u_i, v_i, u_i^{'}, v_i^{'} \right]^T - \left[\hat u_{i}^{'}, \hat v_{i}^{'}, \hat u_{i}, \hat v_{i} \right]^T||^2$$
+
+我们仅仅在可见到的图片空间（也就是2D图片）上衡量error，所以上述$$L_{con}$$不包含深度信息$$z$$，因为深度信息从来就不能直接被观察到，而且和$$u$$，$$v$$具有不同的取值范围。但是我们要注意，在我们的计算中，只有有了$$z$$我们才能够计算两个views之间的projection $$\pi$$。
+
+multi-view consistency对于在不同的views间获取一个consistent的2D keypoint positions集合已经是足够了。但是只有这个loss会导致一个崩坏的结果：所有的keypoints都会集中到同一个位置，这是没有作用的。我们可以定义某种diversity来分开这些keypoints，但是对于multi-view consistency，仍然存在无数种解满足这个条件。所以说我们采取了利用某个下游的任务来选取keypoints的方式。我们使用pose estimation作为我们的任务。
+
+**3.2 Relative pose estimation**
+
+keypoint detection的一个重要的应用就是还原一对图片里的object之间的relative transformation。从而，我们定义一个可微分的目标函数用来衡量预测的relative rotation $$\hat{R}$$（用两个keypoints集合利用Procrustes'alignment计算得来）和ground truth rotation $$R$$之间的差异。因为我们的KeypointNet具有translation equivariance性质，并且我们已经有了上述的multi-view consistency loss，我们在这个loss里就不衡量translation loss了。从而这个pose estimation目标函数定义为：
+
+$$ L_{pose} = 2arcsin(\frac{1}{2\sqrt{2}}||\hat{R}-R||)$$
+
+这衡量了从两个keypoints集合里计算出的least-squares estimate $$\hat{R}$$和ground truth relative rotation matrix $$R$$之间的角度差异。这个目标函数可以用可微分的运算来实现。
+
+为了估计$$\hat{R}$$，$$X$$和$$X^{'} \in R^{3 \times N}$$表示两个views的camera coordinates的3D keypoint locations.也就是说，假设$$X = \left[X_1,X_2,...,X_N \right]$$以及$$X_i = (\pi^{-1}pi)\left[:3 \right]$$。$$X^{'}$$也有类似的定义。$$\tilde{X}$$和$$\tilde{X}^{'}$$表示$$X$$和$$X^{'}$$分别将自身的mean减掉之后的矩阵。从而optimal least-squares rotation $$\hat{R}$$就用以下的方式计算而得：
+
+$$\hat{R} = Vdiag(1,1,...,det(VU^T))U^T$$
+
+其中$$U, \Sigma, V^T = SVD(\tilde X \tilde X^{'T})$$。这个计算rotation $$\hat{R}$$的方式叫做orthogonal Procrustes problem。为了确保$$\tilde{X}\tilde{X}^{'T}$$是invertible的，并且为了增强keypoints的鲁棒性，我们在$$X$$和$$X^{'}$$内加入Gaussian噪音。
+
+从实验结果来看，pose estimation目标函数很大程度的帮助网络产生合理的keypoints，导致网络可以自动的找到一些有意思的地方比如说wheels，飞机的wings，chair的legs等。我们相信这是因为这些部分在一个object类型里是geometrically consistent的（比如说所有的car都有圆形的wheels）。这些keypoints还在空间中分散开。这些对于下游任务都是有好处的。
+
+
+**4. KeypointNet Architecture**
+
+从图片到keypoints的映射的一个重要的性质就是在pixel层面上的translation equivariance。也就是，如果我们将整个input图片，比如说，向左移动一个像素，这个网络输出的所有的keypoint locations也都会向左移动一个像素。训练一个没有这个性质的标准的CNN需要有一个很大的training set，其中包含在各个地方的objects，而且在inference的时候还不能确保equivariance（因为inference时候的object可能会出现在training图片从没出现过的位置上）。
+
+我们使用下面很简单的方式来获得这个equivariance。我们并不是让网络直接输出keypoints的locations，而是让网络输出一个probability distribution map，$$g_i(u,v)$$，表示的是keypoint i在pixel位置$$(u,v)$$地方可能出现的概率，而$$\Sigma_{u,v}g_i(u,v)=1$$对于所有的$$i$$都成立。我们使用一个spatial softmax来对整个image pixels生成这样的distribution。我们之后再计算这个spatial distribution的期望来获得一个pixel coordinate：
+
+$$\left[u_i, v_i\right]^T = \Sigma_{u,v} \left[ug_i(u,v), vg_i(u,v)\right]^T$$
+
+对于$$z$$ coordinates来说，我们同样再每个pixel的位置预测一个深度值，叫做$$d_i(u,v)$$，然后：
+
+$$z_i = \Sigma_{u,v} d_i(u,v) g_i(u,v)$$
+
+为了我们输出的feature map和输入的图片尺寸相同（这样我们才能用上述的计算方式来表示原始输入图片里的keypoint的位置），我们使用的是stride=1的fully convolutional architecture（从[这篇文章](https://openaccess.thecvf.com/content_cvpr_2015/papers/Long_Fully_Convolutional_Networks_2015_CVPR_paper.pdf)用来的），同样也用于semantic segmentation。为了增加网络的感受野，我们将几层dilated convolutions堆叠起来，和[这篇文章](https://d1wqtxts1xzle7.cloudfront.net/56029055/wavenet-with-cover-page-v2.pdf?Expires=1653489733&Signature=NZ8YPKKd4QYPyTFT8LDppJaaJyMLmGidAbnGDeuBHMw7LnvM2cWmiw0YEjxvua5Fjb3hEKU36z0WjnfGZBF3tGJwG1juJvWNULa0y7d2p96v3ab4vrgWhAiBYU3xVT-uiXvoNwVTWmiXaPOARFGc2ulOjfKBS4wpMvgYSHdhZT9IJ4dLmRIQFZpcmOC9~65DuTsKslExG9l37v9-Chzd18dKCYk8yPmza3ke~tNxXcvI2X4COKBSeYxYTdfViS1nivA8GflrCmuPZidn3jAPtdv4O3S1U9EKbtzicuQYvoAQ6mGgCIBwE0sqVtbvI7yKAJi-LBdijyjVgfTtkPaiXg__&Key-Pair-Id=APKAJLOHF5GGSLRBV4ZA)类似。
+
+我们上述这种对于equivariant neural network的设计不仅帮助极大的减小了所需要达到好的泛化效果的训练图片的数量，也减少了camera coordinates到image coordinates的计算量，从而网络可以更专心地做infering depth的任务。
+
+**Architecture details**
+
+所有层的kernel都是$$3 \times 3$$大小的，我们将13个dilated convolutions层堆叠在一起，dilation rates分别是1，1，2，4，8，16，1，2，4，8，16，1，1，每层的输出通道都是64，除了最后一层的输出通道是$$2N$$，一半是$$g_i$$，一半是$$d_i$$。我们对于每层都使用leakyRelu和batch normalization，除了最后一层。最后一层，也就是输出层，是不经过activation function的，前$$N$$个通道作为$$N$$个keypoint的$$d_i$$直接输出，而后$$N$$个通道作为keypoint的$$g_i$$还需要经过一个spatial softmax的计算。最后利用之前的公式计算出每个keypoints的u,v,z。
+
+**Breaking symmetry**
+
+很多object类别在至少一个对称轴上是对称的，比如说一辆轿车的左边和右边很类似。这对于网络来说是个难点，因为不同的part会显示出同样的视觉特征，这只能通过了解全局信息来解决。比如说，分清楚左轮和右轮需要了解更多的相对位置信息。
+
+为了帮助打破这种对称性，我们可以让keypoint prediction依赖于某种对于pose粗糙的量化。这样一种coarse-to-fine的keypoint detection的方法在[这篇文章](https://openaccess.thecvf.com/content_cvpr_2015/papers/Tulsiani_Viewpoints_and_Keypoints_2015_CVPR_paper.pdf)里使用过。
+
+
+**5. Additional Keypoint Characteristics**
+
+除了上面已经说过了的主要的目标函数，对于很多下游的任务来说，还有很多常见的keypoints的性质可以起到帮助的作用，比如说：1）没有两个keypoints能对应到同一个3D location；2）keypoints需要在一个object的轮廓内。
+
+Separation loss对于两个靠的太近的keypoints进行惩罚：
+
+$$L_{sep} = \frac{1}{N^2}\Sigma_{i=1}^{N}\Sigma_{j \neq i}^N max(0, \delta^2-||X_i- X_j||^2)$$
+
+和consistency loss不一样，这个loss是3D loss，也就是说即使两个pixel占据了同一个像素点，但只要它们的深度z不同，那么它们就可以这样分布。
+
+理想情况下的keypoints不应该有这种separation loss。但是因为我们的keypoint并没有它们具体positions的监督数据，如果我们不加上这个loss，会有keypoints到同一个点的问题。
+
+Silhouette consistency鼓励keypoints落在object的轮廓内。正如我们上面所说，我们网络对于第$$i$$个keypoint的position的预测是通过计算$$g_i$$的期望得来的。一个确保silhouette consistency的方法就是只在silhouette内让概率非零，设计一个单峰的low variance的spatial distribution。
+
+在训练过程中，我们对于object还有其mask的信息，也就是$$b(u,v) \in \{0,1\}$$，其中1表示前景object，0表示背景。从而silhouette consistency loss可以被定义为：
+
+$$L_{obj} = \frac{1}{N}\Sigma_{i=1}^N -log\Sigma_{u,v}b(u,v)g_i(u,v)$$
+
+同时还有个loss用来使得variance比较小：
+
+$$L_{var} = \frac{1}{N}\Sigma_{i=1}^N \Sigma_{u,v} g_i(u,v)||\left[u,v\right] - \left[u_i, v_i\right]||^2$$
+
+这一项使得distribution峰比较尖，从而帮助控制keypoint落在object的边界内。
+
+
+**6. Experiments**
+
+我们的training data是从ShapeNet里生成的，其是一个很大的dataset，包含大约51000个3D模型，有超过270个种类的object。我们为多个object种类都建立了不同的training datasets，包括car，chair，plane等。
+
+**6.1 Comparison with a supervised approach**
+
+**6.2 Generalization across views and instances**
+
+**7. Conclusion & Future work**
+
+我们探索了基于一个end-to-end的geometric reasoning framework，而不是keypoint locations的监督数据，来学习一个3D keypoints的稀疏集合的可能性。我们显示，通过使用两个新的目标函数：relative pose estimation loss和multi-view consistency loss，我们可以在含有不同object instances以及不同的视角的同一个object类别的图片中找到consistent的3D keypoints。我们的keypoints要比直接利用keypoints locations的监督信息学习到的keypoints对于rigid 3D pose estimation任务效果更好。
+
+我们通过训练具有随机背景的ShapeNet图片说明我们的网络对于真实世界的图片也是有用的。最近的在domain adaptation领域的工作可以用来改进我们的结果。同时，也可以直接用带有relative pose labels的真实世界的图片来训练KeypointNet。而这种relative pose labels也可以通过Structure-from-motion来自动估计出来。另一个有意思的方向是利用coarse pose initialization或者联合求解relative transformation，这样就可以不需要pose annotations了。
+
+我们的方法还可以被拓展到处理任意数量的keypoints。比如说，我们可以为每个keypoint都输出一个confidence value，然后设定一个阈值来判断是否需要是真的keypoint，同时在没有顺序的keypoints集合上加一个loss。
+
+
 ### [Unsupervised Learning of Visual 3D Keypoints for Control](http://proceedings.mlr.press/v139/chen21b/chen21b.pdf)
 
 *Boyuan Chen, Pieter Abbeel, Deepak Pathak*
