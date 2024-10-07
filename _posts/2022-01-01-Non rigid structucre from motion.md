@@ -42,9 +42,6 @@ tags: paper-reading
 
 流程图如下：
 
-<center>
-<img src='/assets/images/C3DPO-1.png'>
-</center>
 
 ![C3DPO-1]({{ '/assets/images/C3DPO-1.png' | relative_url }})
 {: style="width: 800px; max-width: 100%;", class="center"}
