@@ -595,22 +595,6 @@ $$\mathcal{L_f}(x_i^j, x_{i^{'}}^{j^{'}}) = 1_{\left[ y_i^j = y_{i^{'}}^{j^{'}} 
 为了最终将训练集变为只有$$K$$个clusters，作者再次使用了具有$$K$$个聚类中心的K-means。再之后，因为
 
 
-### \[**NeurIPS 2022 Spotlight**\] [AutoLink: Self-supervised Learning of Human Skeletons and Object Outlines by Linking Keypoints](https://arxiv.org/pdf/2205.10636.pdf)
-
-[CODE](https://github.com/xingzhehe/AutoLink-Self-supervised-Learning-of-Human-Skeletons-and-Object-Outlines-by-Linking-Keypoints)
-
-这篇文章要解决的问题是无监督的从一类物体的图片里学习到2D keypoints。模型的输入是一类物体（比如人脸）的RGB图片，输出是2D keypoints，数量和顺序是固定的。也就是说，模型在输入图片后，输出$$K$$个heatmap，然后从$$K$$个heatmap里获取$$K$$个2D keypoints。所以不同图片的2D keypoints之间的correspondence也是直接就有的。
-
-很多无监督2D keypoints的方法都是一个auto encoder的结构，但这篇文章的创新点有如下几个：
-
-* 首先，网络除了输出$$K$$个heatmap之外，还会输出一个$$K \times K$$的graph，用来表示没两对keypoints之间的权重，而且这个graph是global的，也就说对于每个输入图片，其是共同的。
-* 其次，对于每对输出的keypoints，构建一个edge heatmap，大小和输入图片一样，是以这两个keypoint的连线为中心的Gaussian分布，再利用上面的graph，得到每个像素点位置的global edge heatmap的值
-* 在得到这个global edge heatmap之后，还是一样需要一个decoder来reconstruct原输入图片，显然只有这个骨架是没办法还原的，所以文章的做法是对于输入图片，mask掉其绝大部分区域，和这个edge heatmap沿着channel连起来，作为decoder的输入。
-
-这篇文章的方法很简单，却很有效果。
-
-有个要注意的技术细节是，reconstruction loss不仅仅是reconstructed的图片和原图片之间的mse loss，而是perception loss，也就是将这两个图片都输入某个预训练好的网络，比如在ImageNet上预训练好的VGG19，然后对比很多层的输出之间的差异的和。这样做要比仅仅在像素层面比较区别更加鲁棒。
-
 ### \[**NeurIPS 2018**\] [Unsupervised Learning of Object Landmarks through Conditional Image Generation](https://proceedings.neurips.cc/paper/2018/hash/1f36c15d6a3d18d52e8d493bc8187cb9-Abstract.html)
 
   
@@ -701,6 +685,30 @@ $$\mathcal{L_f}(x_i^j, x_{i^{'}}^{j^{'}}) = 1_{\left[ y_i^j = y_{i^{'}}^{j^{'}} 
 
 
 ### \[**Arxiv 2021**\] [TACK: Few-Shot Keypoint Detection as Task Adaptation via Latent Embeddings](https://sites.google.com/view/2021-tack)
+
+
+### \[**NeurIPS 2022 Spotlight**\] [AutoLink: Self-supervised Learning of Human Skeletons and Object Outlines by Linking Keypoints](https://arxiv.org/pdf/2205.10636.pdf)
+
+[CODE](https://github.com/xingzhehe/AutoLink-Self-supervised-Learning-of-Human-Skeletons-and-Object-Outlines-by-Linking-Keypoints)
+
+这篇文章要解决的问题是无监督的从一类物体的图片里学习到2D keypoints。模型的输入是一类物体（比如人脸）的RGB图片，输出是2D keypoints，数量和顺序是固定的。也就是说，模型在输入图片后，输出$$K$$个heatmap，然后从$$K$$个heatmap里获取$$K$$个2D keypoints。所以不同图片的2D keypoints之间的correspondence也是直接就有的。
+
+很多无监督2D keypoints的方法都是一个auto encoder的结构，但这篇文章的创新点有如下几个：
+
+* 首先，网络除了输出$$K$$个heatmap之外，还会输出一个$$K \times K$$的graph，用来表示没两对keypoints之间的权重，而且这个graph是global的，也就说对于每个输入图片，其是共同的。
+* 其次，对于每对输出的keypoints，构建一个edge heatmap，大小和输入图片一样，是以这两个keypoint的连线为中心的Gaussian分布，再利用上面的graph，得到每个像素点位置的global edge heatmap的值
+* 在得到这个global edge heatmap之后，还是一样需要一个decoder来reconstruct原输入图片，显然只有这个骨架是没办法还原的，所以文章的做法是对于输入图片，mask掉其绝大部分区域，和这个edge heatmap沿着channel连起来，作为decoder的输入。
+
+这篇文章的方法很简单，却很有效果。
+
+有个要注意的技术细节是，reconstruction loss不仅仅是reconstructed的图片和原图片之间的mse loss，而是perception loss，也就是将这两个图片都输入某个预训练好的网络，比如在ImageNet上预训练好的VGG19，然后对比很多层的输出之间的差异的和。这样做要比仅仅在像素层面比较区别更加鲁棒。
+
+
+### \[**CVPR 2024 Highlight**\] [Unsupervised Keypoints from Pretrained Diffusion Models]([https://ubc-vision.github.io/StableKeypoints/](https://openaccess.thecvf.com/content/CVPR2024/papers/Hedlin_Unsupervised_Keypoints_from_Pretrained_Diffusion_Models_CVPR_2024_paper.pdf))
+
+*Eric Hedlin, Gopal Sharma, Shweta Mahajan, Xingzhe He, Hossam Isack, Abhishek Kar, Helge Rhodin, Andrea Tagliasacchi, Kwang Moo Yi*
+
+[CODE](Unsupervised Keypoints from Pretrained Diffusion Models)
 
 
 
