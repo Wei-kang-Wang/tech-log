@@ -687,6 +687,9 @@ $$\mathcal{L_f}(x_i^j, x_{i^{'}}^{j^{'}}) = 1_{\left[ y_i^j = y_{i^{'}}^{j^{'}} 
 ### \[**Arxiv 2021**\] [TACK: Few-Shot Keypoint Detection as Task Adaptation via Latent Embeddings](https://sites.google.com/view/2021-tack)
 
 
+### \[**CVPR 2022**\] [Watch It Move: Unsupervised Discovery of 3D Joints for Re-Posing of Articulated Objects](https://openaccess.thecvf.com/content/CVPR2022/html/Noguchi_Watch_It_Move_Unsupervised_Discovery_of_3D_Joints_for_Re-Posing_CVPR_2022_paper.html)
+
+
 ### \[**NeurIPS 2022 Spotlight**\] [AutoLink: Self-supervised Learning of Human Skeletons and Object Outlines by Linking Keypoints](https://arxiv.org/pdf/2205.10636.pdf)
 
 [CODE](https://github.com/xingzhehe/AutoLink-Self-supervised-Learning-of-Human-Skeletons-and-Object-Outlines-by-Linking-Keypoints)
