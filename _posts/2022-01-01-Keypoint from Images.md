@@ -17,7 +17,7 @@ tags: paper-reading
 
 ## 2D keypoints from images (supervised)
 
-### \[**ECCV 2016}**\] [Stacked hourglass networks for human pose estimation](https://arxiv.org/pdf/1603.06937.pdf)
+### \[**ECCV 2016**\] [Stacked hourglass networks for human pose estimation](https://arxiv.org/pdf/1603.06937.pdf)
 
 *Alejandro Newell, Kaiyu Yang, Jia Deng*
 
