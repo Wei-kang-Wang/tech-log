@@ -632,71 +632,37 @@ $$\mathcal{L_f}(x_i^j, x_{i^{'}}^{j^{'}}) = 1_{\left[ y_i^j = y_{i^{'}}^{j^{'}} 
 [POST](https://www.ytzhang.net/projects/lmdis-rep/)
 
 
-
-
-
-### 12. [Unsupervised Learning of Object Landmarks through Conditional Image Generation](https://proceedings.neurips.cc/paper/2018/hash/1f36c15d6a3d18d52e8d493bc8187cb9-Abstract.html)
-
+### [Unsupervised Learning of Object Landmarks through Conditional Image Generation](https://proceedings.neurips.cc/paper/2018/hash/1f36c15d6a3d18d52e8d493bc8187cb9-Abstract.html)
 
 *NeurIPS 2018*
 
 
-### 13. [Unsupervised Part-Based Disentangling of Object Shape and Appearance](https://openaccess.thecvf.com/content_CVPR_2019/html/Lorenz_Unsupervised_Part-Based_Disentangling_of_Object_Shape_and_Appearance_CVPR_2019_paper.html)
-
-
-*CVPR 2019*
-
-
-### 14. [Unsupervised Learning of Object Keypoints for Perception and Control](https://proceedings.neurips.cc/paper/2019/hash/dae3312c4c6c7000a37ecfb7b0aeb0e4-Abstract.html)
+### [Unsupervised Learning of Object Keypoints for Perception and Control](https://proceedings.neurips.cc/paper/2019/hash/dae3312c4c6c7000a37ecfb7b0aeb0e4-Abstract.html)
 
 *NeurIPS 2019*
 
 
-### 15. [Unsupervised learning of object structure and dynamics from videos](https://proceedings.neurips.cc/paper/2019/hash/d82c8d1619ad8176d665453cfb2e55f0-Abstract.html)
-
-*NeurIPS 2019*
-
-
-### 16. [TransGaGa: Geometry-Aware Unsupervised Image-To-Image Translation](https://openaccess.thecvf.com/content_CVPR_2019/html/Wu_TransGaGa_Geometry-Aware_Unsupervised_Image-To-Image_Translation_CVPR_2019_paper.html)
-
-*CVPR 2019*
-
-
-### 17. [Unsupervised Learning of Landmarks by Descriptor Vector Exchange](https://openaccess.thecvf.com/content_ICCV_2019/html/Thewlis_Unsupervised_Learning_of_Landmarks_by_Descriptor_Vector_Exchange_ICCV_2019_paper.html)
+### [Unsupervised Learning of Landmarks by Descriptor Vector Exchange](https://openaccess.thecvf.com/content_ICCV_2019/html/Thewlis_Unsupervised_Learning_of_Landmarks_by_Descriptor_Vector_Exchange_ICCV_2019_paper.html)
 
 *ICCV 2019*
 
 
-### 18. [Self-Supervised Learning of Interpretable Keypoints From Unlabelled Videos](https://openaccess.thecvf.com/content_CVPR_2020/html/Jakab_Self-Supervised_Learning_of_Interpretable_Keypoints_From_Unlabelled_Videos_CVPR_2020_paper.html)
+### [Self-Supervised Learning of Interpretable Keypoints From Unlabelled Videos](https://openaccess.thecvf.com/content_CVPR_2020/html/Jakab_Self-Supervised_Learning_of_Interpretable_Keypoints_From_Unlabelled_Videos_CVPR_2020_paper.html)
 
 *CVPR 2020*
 
 
-### 19. [Neural Head Reenactment with Latent Pose Descriptors](https://openaccess.thecvf.com/content_CVPR_2020/html/Burkov_Neural_Head_Reenactment_with_Latent_Pose_Descriptors_CVPR_2020_paper.html)
-
-*CVPR 2020*
-
-### 20. [Unsupervised Keypoint Learning for Guiding Class-Conditional Video Prediction](https://proceedings.neurips.cc/paper/2019/hash/801272ee79cfde7fa5960571fee36b9b-Abstract.html)
+### [Unsupervised Keypoint Learning for Guiding Class-Conditional Video Prediction](https://proceedings.neurips.cc/paper/2019/hash/801272ee79cfde7fa5960571fee36b9b-Abstract.html)
 
 *NeurIPS 2019*
 
 
-### 21. [Slim DensePose: Thrifty Learning From Sparse Annotations and Motion Cues](https://openaccess.thecvf.com/content_CVPR_2019/html/Neverova_Slim_DensePose_Thrifty_Learning_From_Sparse_Annotations_and_Motion_Cues_CVPR_2019_paper.html)
-
-*CVPR 2019*
-
-
-### 22. [Self-Supervised Viewpoint Learning From Image Collections](https://openaccess.thecvf.com/content_CVPR_2020/html/Mustikovela_Self-Supervised_Viewpoint_Learning_From_Image_Collections_CVPR_2020_paper.html)
+### [Unsupervised Learning of Intrinsic Structural Representation Points](https://openaccess.thecvf.com/content_CVPR_2020/html/Chen_Unsupervised_Learning_of_Intrinsic_Structural_Representation_Points_CVPR_2020_paper.html)
 
 *CVPR 2020*
 
 
-### 23. [Unsupervised Learning of Intrinsic Structural Representation Points](https://openaccess.thecvf.com/content_CVPR_2020/html/Chen_Unsupervised_Learning_of_Intrinsic_Structural_Representation_Points_CVPR_2020_paper.html)
-
-*CVPR 2020*
-
-
-### 24. [Unsupervised Human Pose Estimation Through Transforming Shape Templates](https://openaccess.thecvf.com/content/CVPR2021/html/Schmidtke_Unsupervised_Human_Pose_Estimation_Through_Transforming_Shape_Templates_CVPR_2021_paper.html)
+### [Unsupervised Human Pose Estimation Through Transforming Shape Templates](https://openaccess.thecvf.com/content/CVPR2021/html/Schmidtke_Unsupervised_Human_Pose_Estimation_Through_Transforming_Shape_Templates_CVPR_2021_paper.html)
 
 *CVPR 2021*
 
@@ -704,158 +670,88 @@ $$\mathcal{L_f}(x_i^j, x_{i^{'}}^{j^{'}}) = 1_{\left[ y_i^j = y_{i^{'}}^{j^{'}} 
 
 
 
-### 25. [Object landmark discovery through unsupervised adaptation](https://proceedings.neurips.cc/paper/2019/hash/97c99dd2a042908aabc0bafc64ddc028-Abstract.html)
+### [Object landmark discovery through unsupervised adaptation](https://proceedings.neurips.cc/paper/2019/hash/97c99dd2a042908aabc0bafc64ddc028-Abstract.html)
 
 *NeurIPS 2019*
 
 
-### 26. [Unsupervised Object Keypoint Learning using Local Spatial Predictability](https://openreview.net/forum?id=GJwMHetHc73)
+### [Unsupervised Object Keypoint Learning using Local Spatial Predictability](https://openreview.net/forum?id=GJwMHetHc73)
 
 *ICLR 2021*
 
 
-### 27. [Semi-supervised Keypoint Localization](https://openreview.net/forum?id=yFJ67zTeI2)
+### [Semi-supervised Keypoint Localization](https://openreview.net/forum?id=yFJ67zTeI2)
 
 *ICLR 2021*
 
 
-### 28. [Self-Supervised Keypoint Discovery in Behavioral Videos](https://openaccess.thecvf.com/content/CVPR2022/papers/Sun_Self-Supervised_Keypoint_Discovery_in_Behavioral_Videos_CVPR_2022_paper.pdf)
+### [Self-Supervised Keypoint Discovery in Behavioral Videos](https://openaccess.thecvf.com/content/CVPR2022/papers/Sun_Self-Supervised_Keypoint_Discovery_in_Behavioral_Videos_CVPR_2022_paper.pdf)
 
 *CVPR 2022*
 
 
-### 29. [Self-Supervised Learning of Class Embeddings from Video](https://openaccess.thecvf.com/content_ICCVW_2019/html/CEFRL/Wiles_Self-Supervised_Learning_of_Class_Embeddings_from_Video_ICCVW_2019_paper.html)
-
-*ICCV 2019*
-
-
-### 30. [Weakly Supervised Keypoint Discovery](https://arxiv.org/pdf/2109.13423.pdf)
+### [Weakly Supervised Keypoint Discovery](https://arxiv.org/pdf/2109.13423.pdf)
 
 *Arxiv 2021*
 
 
-### 31. [Pretrained equivariant features improve unsupervised landmark discovery](https://arxiv.org/pdf/2104.02925.pdf)
+### [Pretrained equivariant features improve unsupervised landmark discovery](https://arxiv.org/pdf/2104.02925.pdf)
 
 *Arxiv 2021*
 
 
-### 32. [Unsupervised Landmark Learning from Unpaired Data](https://arxiv.org/pdf/2007.01053.pdf)
-
-*Arxiv 2020*
-
-[CODE](https://github.com/justimyhxu/ULTRA)
-
-
-### 33. [Video Interpolation and Prediction with Unsupervised Landmarks](https://arxiv.org/pdf/1909.02749.pdf)
+### [Learning Landmarks from Unaligned Data using Image Translation](https://openreview.net/pdf?id=xz3XULBWFE)
 
 *Arxiv 2019*
 
 
-### 34. [An Empirical Study of the Collapsing Problem in Semi-Supervised 2D Human Pose Estimation](https://openaccess.thecvf.com/content/ICCV2021/html/Xie_An_Empirical_Study_of_the_Collapsing_Problem_in_Semi-Supervised_2D_ICCV_2021_paper.html)
-
-*ICCV 2021*
-
-
-### 35. [Learning Landmarks from Unaligned Data using Image Translation](https://openreview.net/pdf?id=xz3XULBWFE)
-
-*Arxiv 2019*
-
-
-### 36. [Self-supervised Learning of Interpretable Keypoints from Unlabelled Videos](https://www.robots.ox.ac.uk/~vgg/research/unsupervised_pose/data/unsupervised_pose.pdf)
+### [Self-supervised Learning of Interpretable Keypoints from Unlabelled Videos](https://www.robots.ox.ac.uk/~vgg/research/unsupervised_pose/data/unsupervised_pose.pdf)
 
 *CVPR Oral*
 
 [POST](https://www.robots.ox.ac.uk/~vgg/research/unsupervised_pose/)
 
 
-### 37. [LEAD: Self-Supervised Landmark Estimation by Aligning Distributions of Feature Similarity](https://openaccess.thecvf.com/content/WACV2022/html/Karmali_LEAD_Self-Supervised_Landmark_Estimation_by_Aligning_Distributions_of_Feature_Similarity_WACV_2022_paper.html)
+### [LEAD: Self-Supervised Landmark Estimation by Aligning Distributions of Feature Similarity](https://openaccess.thecvf.com/content/WACV2022/html/Karmali_LEAD_Self-Supervised_Landmark_Estimation_by_Aligning_Distributions_of_Feature_Similarity_WACV_2022_paper.html)
 
 *WACV 2022*
 
 
-### 38. [JOKR: Joint Keypoint Representation for Unsupervised Cross-Domain Motion Retargeting](https://arxiv.org/pdf/2106.09679.pdf)
-
-*Arxiv 2021*
-
-
-### 39. [Unsupervised Learning of Facial Landmarks based on Inter-Intra Subject Consistencies](https://arxiv.org/pdf/2004.07936.pdf)
+### [Unsupervised Learning of Facial Landmarks based on Inter-Intra Subject Consistencies](https://arxiv.org/pdf/2004.07936.pdf)
 
 *Arxiv 2020*
 
 
-### 40. [Unsupervised Landmark Learning from Unpaired Data](https://arxiv.org/pdf/2007.01053.pdf)
+### [Unsupervised Landmark Learning from Unpaired Data](https://arxiv.org/pdf/2007.01053.pdf)
 
 *Arxiv 2020*
 
-
-### 41. [Self-Supervised Learning of Class Embeddings from Video](https://openaccess.thecvf.com/content_ICCVW_2019/html/CEFRL/Wiles_Self-Supervised_Learning_of_Class_Embeddings_from_Video_ICCVW_2019_paper.html)
-
-*ICCV 2019*
+[CODE](https://github.com/justimyhxu/ULTRA)
 
 
-### 42. [DeepSFM: Structure From Motion Via Deep Bundle Adjustment](https://www.ecva.net/papers/eccv_2020/papers_ECCV/papers/123460222.pdf)
-
-*ECCV 2020*
-
-
-### 43. [SfM-Net: Learning of Structure and Motion from Video](https://arxiv.org/pdf/1704.07804.pdf)
-
-*Arxiv 2017*
-
-
-### 44. [LatentKeypointGAN: Controlling GANs via Latent Keypoints](https://xingzhehe.github.io/LatentKeypointGAN/)
+### [LatentKeypointGAN: Controlling GANs via Latent Keypoints](https://xingzhehe.github.io/LatentKeypointGAN/)
 
 *Arxiv 2021*
 
 
-### 45. [Unsupervised Part Discovery from Contrastive Reconstruction](https://proceedings.neurips.cc/paper/2021/hash/ec8ce6abb3e952a85b8551ba726a1227-Abstract.html)
+### [Unsupervised Part Discovery from Contrastive Reconstruction](https://proceedings.neurips.cc/paper/2021/hash/ec8ce6abb3e952a85b8551ba726a1227-Abstract.html)
 
 *NeurIPS 2021*
 
 
-### 46. [Video Interpolation and Prediction with Unsupervised Landmarks](https://arxiv.org/pdf/1909.02749.pdf)
+### [Video Interpolation and Prediction with Unsupervised Landmarks](https://arxiv.org/pdf/1909.02749.pdf)
 
 *Arxiv 2019*
 
 
-### 47. [An Empirical Study of the Collapsing Problem in Semi-Supervised 2D Human Pose Estimation](https://openaccess.thecvf.com/content/ICCV2021/html/Xie_An_Empirical_Study_of_the_Collapsing_Problem_in_Semi-Supervised_2D_ICCV_2021_paper.html)
-
-*ICCV 2021*
-
-
-### 48. [Unsupervised Part Segmentation Through Disentangling Appearance and Shape](https://openaccess.thecvf.com/content/CVPR2021/html/Liu_Unsupervised_Part_Segmentation_Through_Disentangling_Appearance_and_Shape_CVPR_2021_paper.html)
-
-*CVPR 2021*
-
-
-### 49. [Unsupervised learning of object structure and dynamics from videos](https://proceedings.neurips.cc/paper/2019/hash/d82c8d1619ad8176d665453cfb2e55f0-Abstract.html)
-
-*NeurIPS 2019*
-
-
-### 50. [Unsupervised Part-Based Disentangling of Object Shape and Appearance](https://openaccess.thecvf.com/content_CVPR_2019/html/Lorenz_Unsupervised_Part-Based_Disentangling_of_Object_Shape_and_Appearance_CVPR_2019_paper.html)
-
-*CVPR 2019*
-
-
-### 51. [Unsupervised Learning of Object Structure and Dynamics from Videos](https://openreview.net/pdf/345dd2a33716f95cef4028f94fbd0a322234f1e0.pdf)
-
-*NeurIPS 2019*
-
-
-### 52. [Few-shot Keypoint Detection with Uncertainty Learning for Unseen Species](https://openaccess.thecvf.com/content/CVPR2022/papers/Lu_Few-Shot_Keypoint_Detection_With_Uncertainty_Learning_for_Unseen_Species_CVPR_2022_paper.pdf)
+### [Few-shot Keypoint Detection with Uncertainty Learning for Unseen Species](https://openaccess.thecvf.com/content/CVPR2022/papers/Lu_Few-Shot_Keypoint_Detection_With_Uncertainty_Learning_for_Unseen_Species_CVPR_2022_paper.pdf)
 
 *CVPR 2022*
 
 
-### 53. [TACK: Few-Shot Keypoint Detection as Task Adaptation via Latent Embeddings](https://sites.google.com/view/2021-tack)
+### [TACK: Few-Shot Keypoint Detection as Task Adaptation via Latent Embeddings](https://sites.google.com/view/2021-tack)
 
 *Arxiv 2021*
-
-
-### 54. [ViewNet: Unsupervised Viewpoint Estimation From Conditional Generation](https://openaccess.thecvf.com/content/ICCV2021/html/Mariotti_ViewNet_Unsupervised_Viewpoint_Estimation_From_Conditional_Generation_ICCV_2021_paper.html)
-
-*ICCV 2021*
 
 
 
