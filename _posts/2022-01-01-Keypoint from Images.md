@@ -709,11 +709,11 @@ $$\mathcal{L_f}(x_i^j, x_{i^{'}}^{j^{'}}) = 1_{\left[ y_i^j = y_{i^{'}}^{j^{'}} 
 有个要注意的技术细节是，reconstruction loss不仅仅是reconstructed的图片和原图片之间的mse loss，而是perception loss，也就是将这两个图片都输入某个预训练好的网络，比如在ImageNet上预训练好的VGG19，然后对比很多层的输出之间的差异的和。这样做要比仅仅在像素层面比较区别更加鲁棒。
 
 
-### \[**CVPR 2024 Highlight**\] [Unsupervised Keypoints from Pretrained Diffusion Models]([https://ubc-vision.github.io/StableKeypoints/](https://openaccess.thecvf.com/content/CVPR2024/papers/Hedlin_Unsupervised_Keypoints_from_Pretrained_Diffusion_Models_CVPR_2024_paper.pdf))
+### \[**CVPR 2024 Highlight**\] [Unsupervised Keypoints from Pretrained Diffusion Models](https://openaccess.thecvf.com/content/CVPR2024/papers/Hedlin_Unsupervised_Keypoints_from_Pretrained_Diffusion_Models_CVPR_2024_paper.pdf)
 
 *Eric Hedlin, Gopal Sharma, Shweta Mahajan, Xingzhe He, Hossam Isack, Abhishek Kar, Helge Rhodin, Andrea Tagliasacchi, Kwang Moo Yi*
 
-[CODE](Unsupervised Keypoints from Pretrained Diffusion Models)
+[CODE](https://github.com/ubc-vision/StableKeypoints)
 
 这篇文章和[Unsupervised Semantic Correspondence Using Stable Diffusion](https://ubc-vision.github.io/LDM_correspondences/)一样，基于的想法是，对于训练好的text-based StableDiffusion模型，即使是random的text embedding，和multi-head encoder得到的image embedding计算相似度再可视化，都能看到图中object大致的形状，并且相似度高的区域具有一定的semantics。
 
