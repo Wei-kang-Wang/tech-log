@@ -110,16 +110,6 @@ $$s_{ij} = \gamma_{ij} / \Sigma_{(i^{'}, j^{'})} \gamma_{i^{'}j^{'}}$$
 ## 2D keypoints from images (Unsupervised)
 
 
-
-
-
-
-### \[**3DV 2019**\] [Structured Domain Adaptation for 3D Keypoint Estimation](https://ieeexplore.ieee.org/abstract/document/8885979)
-
-
-
-
-
   
 ### \[**NeurIPS 2019**\] [Unsupervised Learning of Object Keypoints for Perception and Control](https://proceedings.neurips.cc/paper/2019/hash/dae3312c4c6c7000a37ecfb7b0aeb0e4-Abstract.html)
 
@@ -134,9 +124,6 @@ $$s_{ij} = \gamma_{ij} / \Sigma_{(i^{'}, j^{'})} \gamma_{i^{'}j^{'}}$$
 
 ### \[**NeurIPS 2019**\] [Unsupervised Learning of Object Keypoints for Perception and Control](https://proceedings.neurips.cc/paper/2019/hash/dae3312c4c6c7000a37ecfb7b0aeb0e4-Abstract.html)
 
-
-
-### \[**CVPR 2020**\] [Self-Supervised Learning of Interpretable Keypoints From Unlabelled Videos](https://openaccess.thecvf.com/content_CVPR_2020/html/Jakab_Self-Supervised_Learning_of_Interpretable_Keypoints_From_Unlabelled_Videos_CVPR_2020_paper.html)
 
 
 ### \[**NeurIPS 2019**\] [Unsupervised Keypoint Learning for Guiding Class-Conditional Video Prediction](https://proceedings.neurips.cc/paper/2019/hash/801272ee79cfde7fa5960571fee36b9b-Abstract.html)
@@ -180,8 +167,6 @@ $$s_{ij} = \gamma_{ij} / \Sigma_{(i^{'}, j^{'})} \gamma_{i^{'}j^{'}}$$
 
 [CODE](https://github.com/justimyhxu/ULTRA)
 
-
-### \[**Arxiv 2021**\] [LatentKeypointGAN: Controlling GANs via Latent Keypoints](https://xingzhehe.github.io/LatentKeypointGAN/)
 
 
 ### \[**NeurIPS 2021**\] [Unsupervised Part Discovery from Contrastive Reconstruction](https://proceedings.neurips.cc/paper/2021/hash/ec8ce6abb3e952a85b8551ba726a1227-Abstract.html)
