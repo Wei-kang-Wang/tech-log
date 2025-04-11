@@ -1,7 +1,7 @@
 ---
 layout: post
 comments: false
-title: "installation of various systems, environments and platforms"
+title: "系统、环境、平台安装"
 date: 2022-05-01 01:09:00
 
 ---
