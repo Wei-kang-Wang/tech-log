@@ -1,2 +1,3 @@
-# Wkwang' Paper Log
-Weikang's Paper Reading Blog
+# Wkwang' tech Log
+
+Including engineering and technic things
