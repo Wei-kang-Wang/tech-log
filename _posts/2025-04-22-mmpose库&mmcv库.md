@@ -1,7 +1,7 @@
 ---
 layout: post
 comments: false
-title: "mmpose库&mmcv库"
+title: "mmcv库"
 date: 2025-04-22 01:09:00
 tags: language
 
@@ -15,9 +15,9 @@ tags: language
 
 <!--more-->
 
-`mmpose`库是港中文MMLab开发的一个用于pose estimation的库，针对众多pose estimation的任务，包括2D关键点检测、2D物体检测、2D mask检测等等。其和另一个库`mmcv`紧密联系。这两个库建立在PyTorch基础上，定义了一系列更上层的包装，来使得pose estimation相关的任务可以更快速的部署和调试。
+`mmcv`库是港中文MMLab开发的一个建立在PyTorch基础上的库，其定义了一系列更上层的包装，来辅助其他的MMLab开发的库，比如`mmpose`的使用和调试。
 
-以`mmpose 0.29.0`和`mmcv 1.6.2`为例来介绍这两个库。
+以`mmcv 1.6.2`为例来介绍这个库。
 
 ## 一些general的上层设计：`Config`类、`Registry`类和`build_from_cfg()`函数
 
