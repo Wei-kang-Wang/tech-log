@@ -2809,3 +2809,33 @@ git install "git clone https://github.com/skoch9/meshplot.git"
 * https://blog.csdn.net/weixin_43486780/article/details/120433063
 
 
+## 10. Miniconda安装
+
+首先下载最新版本的`Miniconda`：
+
+```bash
+wget https://repo.anaconda.com/miniconda/Miniconda3-latest-Linux-x86_64.sh
+```
+
+安装：
+
+```bash
+sh Miniconda3-latest-Linux-x86_64.sh
+```
+
+激活：
+
+```bash
+source /.bashrc
+conda init
+```
+
+使用如下代码查看是否安装成功：
+
+```bash
+conda --version
+```
+
+参考：
+* https://blog.csdn.net/qq_41636123/article/details/130266232
+
