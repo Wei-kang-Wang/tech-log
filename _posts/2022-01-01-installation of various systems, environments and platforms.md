@@ -2839,3 +2839,10 @@ conda --version
 参考：
 * https://blog.csdn.net/qq_41636123/article/details/130266232
 
+
+## 11. 两条命令解决移动硬盘无法弹出的问题
+
+参考：
+* https://blog.csdn.net/weixin_37706204/article/details/127817821
+
+
